@@ -7,7 +7,7 @@ const bladeConfig = {
     speed: 0.008, // 旋转速度
     growthRate: 0.5, // 生长速度
     colors: ['#5d0caf', '#7329c0', '#823cc4', '#9254da',
-        '#a268e1', '#bb8eec', '#d6b4f1', '#ead6ff'],
+            '#a268e1', '#bb8eec', '#d6b4f1', '#ead6ff'],
     minSize: 30,
     maxSize: 100
 };
@@ -92,7 +92,7 @@ function animateVortex() {
 
     // 移除超出范围或完全透明的叶片
     blades = blades.filter(blade => {
-        if (blade.position > 1 || (blade.position > 0.5 && blade.opacity <= 0)) {
+        if (blade.position >= 1 || (blade.opacity <= 0)) {
             if (blade.element.parentNode) {
                 blade.element.parentNode.removeChild(blade.element);
             }

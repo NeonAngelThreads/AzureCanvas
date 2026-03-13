@@ -10,9 +10,6 @@ body {
     height: 100vh;
     overflow: hidden;
     position: relative;
-    /* 学校背景图片 (浅色半透明建筑) 使用官网风格底图
-    background-image: url('https://www.must.edu.mo/images/building_light.jpg'),
-    linear-gradient(145deg, #f0f7ff 0%, #d9e9fa 100%); */
     background-size: cover;
     background: linear-gradient(135deg, #160228, #300a4d) center;
     background-blend-mode: overlay;
@@ -25,9 +22,6 @@ body.light-mode {
     --bg-overlay: rgba(255,255,255,0.8);
 }
 body.dark-mode {
-    /* 深色模式覆盖深色半透明，让背景图变暗
-    background-image: url('https://www.must.edu.mo/images/building_dark.jpg'),
-        linear-gradient(145deg, #0a0c1e 0%, #1a1f35 100%); */
     background-blend-mode: overlay;
     --bg-overlay: rgba(0,0,0,0.6);
 }
@@ -44,7 +38,6 @@ body.dark-mode {
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
     transition: opacity 0.8s ease;
     backdrop-filter: blur(4px);
 }
@@ -55,7 +48,7 @@ body.dark-mode {
     width: 100%;
     height: 100%;
     display: block;
-    z-index: 201;
+    z-index: -5;
 }
 /* 校徽进入框 - Aero 风格 */
 .splash-logo {
@@ -64,19 +57,22 @@ body.dark-mode {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 60px;
     padding: 30px 70px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(21, 25, 44, 0.45);
+    border: 1px solid rgba(37, 18, 89, 0.38);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 20px;
-    backdrop-filter: blur(25px) saturate(180%);
+    cursor: pointer;
+    backdrop-filter: saturate(180%);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .splash-logo:hover {
     border-color: rgba(255, 255, 255, 0.3);
     border-radius: 70px;
+    z-index: 1000;
+    backdrop-filter: blur(60px) saturate(180%);
     transform: scale(1.05) translateY(-5px);
     box-shadow: 0 20px 60px rgba(37, 101, 176, 0.4);
 }
@@ -87,6 +83,7 @@ body.dark-mode {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    z-index: 90;
     filter: drop-shadow(0 0 15px rgba(255, 0, 128, 0.4));
 }
 
@@ -243,6 +240,7 @@ body.dark-mode {
     display: flex;
     align-items: center;
     gap: 14px;
+    backdrop-filter: blur(25px);
     background: rgba(255, 255, 255, 0.02);
 }
 
@@ -281,7 +279,7 @@ body.dark-mode {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 10;
+    z-index: 110;
     pointer-events: none;
 }
 
@@ -289,6 +287,7 @@ body.dark-mode {
     position: absolute;
     width: 100%;
     height: 100%;
+    z-index: 100;
 }
 
 .turbine-blade {
@@ -297,8 +296,11 @@ body.dark-mode {
     left: 50%;
     border-radius: 10px;
     transform-origin: center;
-    box-shadow: 0 0 25px rgba(121, 40, 202, 0.6);
+    box-shadow: 0 0 25px rgba(57, 15, 100, 0.6);
     filter: blur(1px);
+
+    transition: all 0.15s ease;
+    z-index: 10;
 }
 
 .outer-ring {
