@@ -1,6 +1,6 @@
-const splashScreen = document.querySelector('#splash-screen');
-const mainInterface = document.getElementById('main-interface');
-const splashCanvas = document.getElementById('splash-canvas');
+window.splashScreen = document.querySelector('#splash-screen');
+window.mainInterface = document.getElementById('main-interface');
+window.splashCanvas = document.getElementById('splash-canvas');
 const ctxSplash = splashCanvas.getContext('2d');
 let width, height;
 let splashParticles = [];

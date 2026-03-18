@@ -27,3 +27,17 @@ themeToggle.addEventListener('click', (e) => {
         themeToggle.innerHTML = '<i class="fas fa-moon"></i> 夜间模式';
     }
 });
+
+// 数字时钟功能
+function updateClock() {
+    const clockElement = document.getElementById('digital-clock');
+    if (!clockElement) return;
+    
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    clockElement.textContent = `${hours}:${minutes}`;
+}
+
+setInterval(updateClock, 1000);
+updateClock();
