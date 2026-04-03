@@ -23,10 +23,10 @@
     // 平滑系数
     const SMOOTHING = 0.1;
     
-    // ========== 鼠标事件监听 ==========
-    document.addEventListener('mousemove', function(event) {
-        const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-        const mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+    // ========== 鼠标位置 → 旋转角度 ==========
+    function updateTargetRotation(clientX, clientY) {
+        const mouseX = (clientX / window.innerWidth) * 2 - 1;
+        const mouseY = (clientY / window.innerHeight) * 2 - 1;
         
         // 最大旋转角度：水平180度，垂直90度
         let newRotateY = mouseX * 180 * SENSITIVITY_X;
@@ -41,31 +41,48 @@
         
         targetRotateX = newRotateX;
         targetRotateY = newRotateY;
-    });
+    }
     
-    // ========== 动画循环 ==========
+    // ========== 等待画布生成，绑定鼠标事件 ==========
+    function bindToCanvas() {
+        const canvas = document.querySelector('canvas');
+        if (!canvas) {
+            setTimeout(bindToCanvas, 100);
+            return;
+        }
+        
+        // 鼠标在立方体上移动 → 旋转
+        canvas.addEventListener('mousemove', function(e) {
+            updateTargetRotation(e.clientX, e.clientY);
+        });
+        
+        // 鼠标离开立方体 → 慢慢回正
+        canvas.addEventListener('mouseleave', function() {
+            targetRotateX = 0;
+            targetRotateY = 0;
+        });
+        
+        console.log('鼠标交互模块已绑定到立方体');
+    }
+    
+    // ========== 动画循环（平滑过渡） ==========
     function animateSmoothRotation() {
         currentRotateX += (targetRotateX - currentRotateX) * SMOOTHING;
         currentRotateY += (targetRotateY - currentRotateY) * SMOOTHING;
         
         if (typeof window.rotateCube === 'function') {
             window.rotateCube(currentRotateX, currentRotateY);
-        } else {
-            // 开发阶段静默运行，不输出日志
         }
         
         requestAnimationFrame(animateSmoothRotation);
     }
     
+    // ========== 启动 ==========
+    bindToCanvas();
     animateSmoothRotation();
     
     // ========== 暴露配置接口 ==========
     window.cubeInteraction = {
-        setSensitivity: function(x, y) {
-            // 如果需要动态调整灵敏度，取消下面注释
-            // 但一般用默认值就够了
-            console.log('灵敏度调整暂未启用，使用默认值 x:1.0 y:1.0');
-        },
         resetRotation: function() {
             targetRotateX = 0;
             targetRotateY = 0;
