@@ -12,14 +12,17 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
+import { initScrollEffect } from './cube.scroll.js';
+
 let scene, camera, renderer, composer, cube, earth, glowMesh;
-let isCubePage = false;
+export let isCubePage = false;
 let targetRotation = { x: 0, y: 0 };
 let currentRotation = { x: 0, y: 0 };
 let mousePosition = { x: 0, y: 0 };
 let clock = new THREE.Clock();
 
 function initCube() {
+    initScrollEffect();
     // 获取容器
     const cubeContainer = document.getElementById('cube-container');
     if (!cubeContainer) return;
@@ -38,7 +41,7 @@ function initCube() {
     // 创建场景
     scene = new THREE.Scene();
     // 背景
-    scene.background = new THREE.Color('#0b1021');
+    scene.background = new THREE.Color('#2f163d');
     
     // 注入 CSS 渐变背景 (实现梦幻淡蓝中心)
     cubeContainer.style.background = 'radial-gradient(circle at center, #ffffff 0%, #eef6ff 100%)';
@@ -105,18 +108,31 @@ function initCube() {
     const glassMaterial = new THREE.MeshPhysicalMaterial({
         color: new THREE.Color('#ffffff'),
         metalness: 0,
-        roughness: 0,           
-        transmission: 1.0,      
-        ior: 1.52,               // 回归标准玻璃折射率，防止侧面全反射
-        thickness: 1.5,         // 减小厚度，增加折射清晰度
+        roughness: 0,
+        iridescenceIOR: 1.9,
+        iridescence: 0.7,
+        transmission: 1.0,
+        ior: 1.9,               // 回归标准玻璃折射率，防止侧面全反射
+        thickness: 2.7,         // 减小厚度，增加折射清晰度
         specularIntensity: 1.0,
         clearcoat: 1.0,         
         clearcoatRoughness: 0.02,
         attenuationDistance: 1.5,
-        attenuationColor: new THREE.Color('#e0f2ff'), 
+        attenuationColor: new THREE.Color('#e6deff'),
         transparent: true,
+
         side: THREE.DoubleSide,
     });
+
+    // const castIridescence = new THREE.MeshTransmissionMaterial(
+    //     {
+    //         backside: true,
+    //         backsideThickness: -1,
+    //         thickness: 0.07,
+    //         anisotropicBlur: 0.02,
+    //
+    //     }
+    // )
 
     glassMaterial.renderOrder = 1;
 
@@ -137,12 +153,12 @@ function initCube() {
                 gl_FragColor.r += shift;
                 gl_FragColor.b -= shift * 0.3;
                 // 增强边缘清澈白光
-                gl_FragColor.rgb += fresnel * vec3(0.5, 0.6, 0.8) * 0.5;
+                gl_FragColor.rgb += fresnel * vec3(0.5, 0.6, 0.8) * 0.1;
             } else {
                 // 内部幽灵反射 (背面)
-                gl_FragColor.rgb *= vec3(0.9, 0.95, 1.1); 
+                gl_FragColor.rgb *= vec3(0.9, 0.95, 1.1) * fresnel; 
                 gl_FragColor.rgb += vec3(0.1, 0.15, 0.2) * fresnel;
-                gl_FragColor.a *= 0.5; 
+                gl_FragColor.a *= 0.7; 
             }
             `
         );
@@ -310,8 +326,8 @@ function animate() {
 
 // 全局旋转函数
 window.rotateCube = function (x, y) {
-    targetRotation.x += x * 0.01;
-    targetRotation.y += y * 0.01;
+    targetRotation.x += x * 0.4;
+    targetRotation.y += y * 0.4;
 };
 
 // 导出功能到全局
