@@ -1,3 +1,9 @@
+// ============================================
+// 主界面交互模块
+// 包括主题切换、启动页点击事件、数字时钟等功能
+// 负责人：@Sun
+// ============================================
+
 const themeToggle = document.getElementById('themeToggle');
 
 const themeIcon = document.getElementById('themeIcon');

@@ -1,3 +1,8 @@
+// ============================================
+// 星场效果
+// 负责人：@Sun
+// ============================================
+
 window.splashScreen = document.querySelector('#splash-screen');
 window.mainInterface = document.getElementById('main-interface');
 window.splashCanvas = document.getElementById('splash-canvas');
