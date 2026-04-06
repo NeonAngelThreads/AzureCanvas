@@ -1,15 +1,15 @@
-package org.angellock.impl.spring;
+package org.neonangellock.azurecanvas.rounters;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class AppRouter {
-    @GetMapping("/")
+    @GetMapping("/app")
     public String loadHome(){
         return "home";
     }
-    @GetMapping("/home")
+    @GetMapping("/azurecanvas")
     public String loadHomeAlt(){
         return "home";
     }

@@ -50,7 +50,7 @@ function initCube() {
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();
 
-    rgbeLoader.load('https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/dancing_hall_1k.hdr', (texture) => {
+    rgbeLoader.load('../texture/hdr/dancing_hall_1k.hdr', (texture) => {
         const envMap = pmremGenerator.fromEquirectangular(texture).texture;
         scene.environment = envMap;
         
@@ -99,7 +99,7 @@ function initCube() {
             // 2. 模拟色散 (Chromatic Aberration)
             // 在边缘处对 R 和 B 通道进行不同程度的偏移
             vec3 viewDir = normalize(vViewPosition);
-            float distortion = fresnel * 0.4;
+            float distortion = fresnel * 0.8;
             
             // 增强高光边缘
             gl_FragColor.rgb += fresnel * vec3(0.2, 0.3, 0.5); 
@@ -112,8 +112,8 @@ function initCube() {
                 gl_FragColor.a *= 0.5; // 背部面稍微透明一点
             } else {
                 // 正面增加一点点彩虹色散感
-                gl_FragColor.r += distortion * 0.1;
-                gl_FragColor.b -= distortion * 0.05;
+                gl_FragColor.r += distortion * 0.3;
+                gl_FragColor.b -= distortion * 0.15;
             }
             
             // 增加整体的清澈感
@@ -160,7 +160,7 @@ function initCube() {
     // 加载模型 (自动处理路径)
     const isCubeSubdir = window.location.pathname.includes('/cube/');
     const modelPath = isCubeSubdir ? '../models/earth-transformed.glb' : 'models/earth-transformed.glb';
-    const envPath = 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/dancing_hall_1k.hdr';
+    //const envPath = 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/dancing_hall_1k.hdr';
     
     loader.load(modelPath, (gltf) => {
         earth = gltf.scene;
