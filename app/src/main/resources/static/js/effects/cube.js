@@ -113,7 +113,7 @@ function initCube() {
         iridescence: 0.7,
         transmission: 1.0,
         ior: 1.9,               // 回归标准玻璃折射率，防止侧面全反射
-        thickness: 2.7,         // 减小厚度，增加折射清晰度
+        thickness: 3,         // 减小厚度，增加折射清晰度
         specularIntensity: 1.0,
         clearcoat: 1.0,         
         clearcoatRoughness: 0.02,
