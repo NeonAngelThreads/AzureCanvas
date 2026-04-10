@@ -43,7 +43,7 @@ function initCube() {
     // 创建场景
     scene = new THREE.Scene();
     // 背景
-    scene.background = new THREE.Color('rgba(217,155,255,0.63)');
+    scene.background = new THREE.Color('rgb(255,255,255)');
     
     // 注入 CSS 渐变背景 (实现梦幻淡蓝中心)
     cubeContainer.style.background = 'radial-gradient(circle at center, #ffffff 0%, #eef6ff 100%)';
@@ -88,12 +88,12 @@ function initCube() {
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();
 
-    rgbeLoader.load('../textures/hdr/spruit_sunrise_1k.hdr', (texture) => {
-        const envMap = pmremGenerator.fromEquirectangular(texture).texture;
-        scene.environment = envMap;
-        texture.dispose();
-        pmremGenerator.dispose();
-    });
+    // rgbeLoader.load('../textures/hdr/spruit_sunrise_1k.hdr', (texture) => {
+    //     const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+    //     scene.environment = envMap;
+    //     texture.dispose();
+    //     pmremGenerator.dispose();
+    // });
 
     // 添加高质量光照
     const ambientLight = new THREE.AmbientLight(new THREE.Color('#78eaff'), 0.6);
@@ -115,7 +115,7 @@ function initCube() {
         iridescence: 0.8,
         transmission: 1.0,
         ior: 2.2,               // 回归标准玻璃折射率，防止侧面全反射
-        thickness: -1,         // 减小厚度，增加折射清晰度
+        thickness: 1,         // 减小厚度，增加折射清晰度
         specularIntensity: 1.0,
         clearcoat: 1.0,         
         clearcoatRoughness: 0.02,
@@ -124,16 +124,6 @@ function initCube() {
         transparent: true,
         side: THREE.DoubleSide,
     });
-
-    // const castIridescence = new THREE.MeshTransmissionMaterial(
-    //     {
-    //         backside: true,
-    //         backsideThickness: -1,
-    //         thickness: 0.07,
-    //         anisotropicBlur: 0.02,
-    //
-    //     }
-    // )
 
     glassMaterial.renderOrder = 0;
 
@@ -167,27 +157,29 @@ function initCube() {
     };
 
     const transmissionMaterial = Object.assign(new MeshTransmissionMaterial(10), {
+        color: new THREE.Color('#ffffff'),
         clearcoat: 1,
         clearcoatRoughness: 0,
         transmission: 1,
-        iridescenceIOR: 0.7,
-        chromaticAberration: 0.03,
-        anisotrophicBlur: 0.1,
+        iridescenceIOR: 0.8,
+        chromaticAberration: 0.2,
+        anisotrophicBlur: 0.6,
         // Set to > 0 for diffuse roughness
         roughness: 0,
-        thickness: -1,
-        ior: 1.5,
+        thickness: 0.4,
+        ior: 2.5,
         // Set to > 0 for animation
         distortion: 0.1,
-        distortionScale: 0.2,
-        temporalDistortion: 0.2,
-        anisotropicBlur: 0.2,
+        distortionScale: 0.3,
+        temporalDistortion: 0.4,
+        backsideThickness: -1,
+        anisotropicBlur: 0.4,
 
         side: THREE.DoubleSide
     });
 
-    cube = new THREE.Mesh(cubeGeometry, glassMaterial);
-    cube.material = transmissionMaterial;
+    cube = new THREE.Mesh(cubeGeometry, transmissionMaterial);
+    //cube.material = transmissionMaterial;
 
     scene.add(cube);
 
