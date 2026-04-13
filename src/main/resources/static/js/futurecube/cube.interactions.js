@@ -45,7 +45,7 @@
     
     // ========== 等待画布生成，绑定鼠标事件 ==========
     function bindToCanvas() {
-        const canvas = document.getElementById('cube-container');//document.querySelector('canvas');
+        const canvas = document.getElementsByTagName('canvas');//document.querySelector('canvas');
         if (!canvas) {
             setTimeout(bindToCanvas, 100);
             console.error("when an error")

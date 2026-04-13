@@ -16,12 +16,14 @@ import './cube.interactions.js'
 
 import { initScrollEffect } from './cube.scroll.js';
 
-let scene, camera, renderer, composer, cube, earth, glowMesh;
+let scene, camera, renderer, composer, cube, earth, glowMesh, transmissionMaterial;
 export let isCubePage = false;
 let targetRotation = { x: 0, y: 0 };
 let currentRotation = { x: 0, y: 0 };
 let mousePosition = { x: 0, y: 0 };
 let clock = new THREE.Clock();
+
+const isCubeSubdir = window.location.pathname.includes('/cube/');
 
 function initCube() {
     initScrollEffect();
@@ -43,7 +45,7 @@ function initCube() {
     // 创建场景
     scene = new THREE.Scene();
     // 背景
-    scene.background = new THREE.Color('rgb(255,255,255)');
+    scene.background = new THREE.Color('rgb(128,113,187)');
     
     // 注入 CSS 渐变背景 (实现梦幻淡蓝中心)
     cubeContainer.style.background = 'radial-gradient(circle at center, #ffffff 0%, #eef6ff 100%)';
@@ -103,33 +105,39 @@ function initCube() {
     mainLight.position.set(5, 10, 7);
     scene.add(mainLight);
 
-    // 1. 创建玻璃立方体
-    const cubeGeometry = new THREE.BoxGeometry(3.5, 3.5, 3.5);
-    
-    // 核心参数调优：修复侧面不渲染问题 (IOR设为标准玻璃)
-    const glassMaterial = new THREE.MeshPhysicalMaterial({
+    // 1. 加载 FutureCube 玻璃模型替换原始立方体
+    const cubeLoader = new GLTFLoader();
+    const dracoLoaderForCube = new DRACOLoader();
+    dracoLoaderForCube.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
+    cubeLoader.setDRACOLoader(dracoLoaderForCube);
+
+    const cubeModelPath = isCubeSubdir ? '../models/FutureCube.glb' : 'models/FutureCube.glb';
+    //const cubeModelPath = isCubeSubdir ? '../models/FutureModel.glb' : 'models/FutureModel.glb';
+
+    transmissionMaterial = Object.assign(new MeshTransmissionMaterial(10), {
         color: new THREE.Color('#ffffff'),
-        metalness: 0,
+        clearcoat: 1,
+        clearcoatRoughness: 0,
+        transmission: 1,
+        iridescenceIOR: 0.8,
+        chromaticAberration: 0.2,
+        anisotrophicBlur: 0.6,
         roughness: 0,
-        iridescenceIOR: 1.9,
-        iridescence: 0.8,
-        transmission: 1.0,
-        ior: 2.2,               // 回归标准玻璃折射率，防止侧面全反射
-        thickness: 1,         // 减小厚度，增加折射清晰度
-        specularIntensity: 1.0,
-        clearcoat: 1.0,         
-        clearcoatRoughness: 0.02,
-        attenuationDistance: 1.5,
-        attenuationColor: new THREE.Color('#e6deff'),
-        transparent: true,
-        side: THREE.DoubleSide,
+        thickness: 0.4,
+        ior: 2,
+        distortion: 0.1,
+        distortionScale: 0.3,
+        temporalDistortion: 0.4,
+        backsideThickness: 3,
+        anisotropicBlur: 0.4,
+        side: THREE.DoubleSide
     });
 
-    glassMaterial.renderOrder = 0;
-
-    // 注入高级着色器逻辑
-    glassMaterial.onBeforeCompile = (shader) => {
-        shader.uniforms.time = { value: 0 };
+    // 注入原有的高级着色器逻辑 (色散与菲涅尔反射)
+    const originalOnBeforeCompile = transmissionMaterial.onBeforeCompile;
+    transmissionMaterial.onBeforeCompile = (shader) => {
+        if (originalOnBeforeCompile) originalOnBeforeCompile(shader);
+        
         shader.fragmentShader = shader.fragmentShader.replace(
             '#include <dithering_fragment>',
             `
@@ -153,35 +161,28 @@ function initCube() {
             }
             `
         );
-        glassMaterial.userData.shader = shader;
+        transmissionMaterial.userData.shader = shader;
     };
 
-    const transmissionMaterial = Object.assign(new MeshTransmissionMaterial(10), {
-        color: new THREE.Color('#ffffff'),
-        clearcoat: 1,
-        clearcoatRoughness: 0,
-        transmission: 1,
-        iridescenceIOR: 0.8,
-        chromaticAberration: 0.2,
-        anisotrophicBlur: 0.6,
-        // Set to > 0 for diffuse roughness
-        roughness: 0,
-        thickness: 0.4,
-        ior: 2.5,
-        // Set to > 0 for animation
-        distortion: 0.1,
-        distortionScale: 0.3,
-        temporalDistortion: 0.4,
-        backsideThickness: -1,
-        anisotropicBlur: 0.4,
+    cubeLoader.load(cubeModelPath, (gltf) => {
+        cube = gltf.scene;
+        cube.renderOrder = 1; // 确保在地球后面渲染，以便透视
 
-        side: THREE.DoubleSide
+        cube.traverse((child) => {
+            if (child.isMesh) {
+                child.material = transmissionMaterial;
+            }
+        });
+
+        // 自动缩放模型到合适大小
+        const box = new THREE.Box3().setFromObject(cube);
+        const size = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 3.5 / maxDim; // 匹配原立方体大小
+        cube.scale.set(scale, scale, scale);
+
+        scene.add(cube);
     });
-
-    cube = new THREE.Mesh(cubeGeometry, transmissionMaterial);
-    cube.material = transmissionMaterial;
-
-    scene.add(cube);
 
     // --- 地球自发光/丁达尔氛围层 ---
     const glowGeo = new THREE.SphereGeometry(1.3, 32, 32);
@@ -226,10 +227,8 @@ function initCube() {
     dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
     loader.setDRACOLoader(dracoLoader);
 
-    const isCubeSubdir = window.location.pathname.includes('/cube/');
-    //const modelPath = isCubeSubdir ? '../models/earth-transformed.glb' : 'models/earth-transformed.glb';
-    const modelPath = isCubeSubdir ? '../models/islands/isleA.glb' : 'models/islands/isleA.glb';
-
+    const modelPath = isCubeSubdir ? '../models/earth-flat.glb' : 'models/earth-flat.glb';
+    //const modelPath = isCubeSubdir ? '../models/islands/isleA.glb' : 'models/islands/isleA.glb';
 
     loader.load(modelPath, (gltf) => {
         earth = gltf.scene;
@@ -306,17 +305,25 @@ function animate() {
     const time = clock.getElapsedTime();
 
     if (isCubePage) {
-        targetRotation.y = mousePosition.x * 0.4;
-        targetRotation.x = -mousePosition.y * 0.4;
-
-        currentRotation.x += (targetRotation.x - currentRotation.x) * 0.08;
-        currentRotation.y += (targetRotation.y - currentRotation.y) * 0.08;
+        // targetRotation.y = mousePosition.x * 0.4;
+        // targetRotation.x = -mousePosition.y * 0.4;
+        //
+        // currentRotation.x += (targetRotation.x - currentRotation.x) * 0.08;
+        // currentRotation.y += (targetRotation.y - currentRotation.y) * 0.08;
 
         if (cube) {
             cube.rotation.x = currentRotation.x;
             cube.rotation.y = currentRotation.y;
-            if (cube.material.userData.shader) {
-                cube.material.userData.shader.uniforms.time.value = time;
+            
+            // 更新所有网格的着色器时间
+            cube.traverse((child) => {
+                if (child.isMesh && child.material.userData.shader) {
+                    child.material.userData.shader.uniforms.time.value = time;
+                }
+            });
+            // 同时更新材质自身的 time uniform (MeshTransmissionMaterial 使用)
+            if (transmissionMaterial && transmissionMaterial.uniforms) {
+                transmissionMaterial.uniforms.time.value = time;
             }
         }
 

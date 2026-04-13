@@ -63,7 +63,7 @@ window.addEventListener('mousedown', () => {
         onUpdate: () => camera.updateProjectionMatrix(),
         onComplete: () => {
             // 2. 跳转到瀑布内页面
-            window.location.href = './inner-portal.html';
+            window.location.href = 'inner-portal.html';
         }
     });
 });
