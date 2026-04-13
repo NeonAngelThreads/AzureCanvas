@@ -20,7 +20,7 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
             { 
                 name: 'IsleA', 
                 path: '../models/Islands/IsleA.glb', 
-                link: '../treehole/tree_hole.html',
+                link: '../treehole/treehole.html',
                 scale: 2 // 微调缩放
             },
             { 
@@ -172,7 +172,7 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
         const speed = Math.random() * 0.05 + 0.05;
         crane.userData.velocity = new THREE.Vector3(
             Math.cos(angle) * speed,
-            (Math.random() - 0.5) * 0.01, // 极轻微的上下漂移
+            Math.cos(angle) * speed, // 极轻微的上下漂移
             Math.sin(angle) * speed
         );
         crane.rotation.y = -angle + Math.PI / 2;
@@ -320,17 +320,17 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
                 y: midPos.y,
                 z: midPos.z,
                 duration: 0.8,
-                ease: "power2.inOut",
-                onUpdate: () => camera.lookAt(target.position)
-            })
-            .to(camera.position, {
-                x: targetCamPos.x,
-                y: targetCamPos.y,
-                z: targetCamPos.z,
-                duration: 1.0,
-                ease: "power2.out",
+                ease: "power2.in",
                 onUpdate: () => camera.lookAt(target.position)
             });
+            // .to(camera.position, {
+            //     x: targetCamPos.x,
+            //     y: targetCamPos.y,
+            //     z: targetCamPos.z,
+            //     duration: 1.0,
+            //     ease: "power2.out",
+            //     onUpdate: () => camera.lookAt(target.position)
+            // });
             
         } else {
             camera.position.copy(targetCamPos);
@@ -424,13 +424,12 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
     function animate() {
         requestAnimationFrame(animate);
-        const delta = clock.getDelta();
         const elapsed = clock.getElapsedTime();
 
         // 千纸鹤直线运动
         craneGroup.children.forEach((crane, i) => {
             crane.position.addScaledVector(crane.userData.velocity, 1);
-            crane.position.y += Math.sin(elapsed * 2 + i) * 0.01; // 极小的上下呼吸感
+            // crane.position.y += Math.sin(elapsed * 2 + i) * 0.01; // 不需上下呼吸感
 
             // 翅膀拍动 (操作折纸翅膀顶点)
             const pos = crane.geometry.attributes.position;
@@ -465,7 +464,7 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
             camera.position.x += (targetX - camera.position.x) * 0.05;
             camera.position.y += (targetY - camera.position.y) * 0.05;
             camera.position.z += (targetZ - camera.position.z) * 0.05;
-            camera.lookAt(islands[currentIndex].position);
+            //camera.lookAt(islands[currentIndex].position);
         }
 
         renderer.render(scene, camera);

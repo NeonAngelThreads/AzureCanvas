@@ -18,9 +18,7 @@ import { initScrollEffect } from './cube.scroll.js';
 
 let scene, camera, renderer, composer, cube, earth, glowMesh, transmissionMaterial;
 export let isCubePage = false;
-let targetRotation = { x: 0, y: 0 };
 let currentRotation = { x: 0, y: 0 };
-let mousePosition = { x: 0, y: 0 };
 let clock = new THREE.Clock();
 
 const isCubeSubdir = window.location.pathname.includes('/cube/');
@@ -45,10 +43,10 @@ function initCube() {
     // 创建场景
     scene = new THREE.Scene();
     // 背景
-    scene.background = new THREE.Color('rgb(128,113,187)');
+    scene.background = new THREE.Color('rgb(159,163,196)');
     
     // 注入 CSS 渐变背景 (实现梦幻淡蓝中心)
-    cubeContainer.style.background = 'radial-gradient(circle at center, #ffffff 0%, #eef6ff 100%)';
+    //cubeContainer.style.background = 'radial-gradient(circle at center, #ffffff 0%, #eef6ff 100%)';
 
     // 创建相机
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -90,7 +88,7 @@ function initCube() {
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();
 
-    rgbeLoader.load('../textures/hdr/spruit_sunrise_1k.hdr', (texture) => {
+    rgbeLoader.load('hdr/spruit_sunrise_1k.hdr', (texture) => {
         const envMap = pmremGenerator.fromEquirectangular(texture).texture;
         scene.environment = envMap;
         texture.dispose();
@@ -119,17 +117,18 @@ function initCube() {
         clearcoat: 1,
         clearcoatRoughness: 0,
         transmission: 1,
+        iridescence: 0.6,
         iridescenceIOR: 0.8,
-        chromaticAberration: 0.2,
+        chromaticAberration: 0.6,
         anisotrophicBlur: 0.6,
         roughness: 0,
         thickness: 0.4,
         ior: 2,
         distortion: 0.1,
-        distortionScale: 0.3,
+        distortionScale: 0.7,
         temporalDistortion: 0.4,
         backsideThickness: 3,
-        anisotropicBlur: 0.4,
+        anisotropicBlur: 0.6,
         side: THREE.DoubleSide
     });
 
@@ -250,7 +249,7 @@ function initCube() {
                 child.material.metalness = 0.2;
                 child.material.roughness = 0.5;
                 child.material.emissive = new THREE.Color(0x0066ff); // 梦幻蓝
-                child.material.emissiveIntensity = 1.5;            // 配合Bloom产生丁达尔感
+                child.material.emissiveIntensity = 0.5;            // 配合Bloom产生丁达尔感
                 child.material.transparent = false;
             }
         });
@@ -272,12 +271,6 @@ function initCube() {
 
     // 响应窗口大小变化
     window.addEventListener('resize', onWindowResize);
-
-    // 鼠标移动监听
-    window.addEventListener('mousemove', (e) => {
-        mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
-        mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
-    });
 
     // 开始动画循环
     animate();
@@ -305,12 +298,6 @@ function animate() {
     const time = clock.getElapsedTime();
 
     if (isCubePage) {
-        // targetRotation.y = mousePosition.x * 0.4;
-        // targetRotation.x = -mousePosition.y * 0.4;
-        //
-        // currentRotation.x += (targetRotation.x - currentRotation.x) * 0.08;
-        // currentRotation.y += (targetRotation.y - currentRotation.y) * 0.08;
-
         if (cube) {
             cube.rotation.x = currentRotation.x;
             cube.rotation.y = currentRotation.y;
@@ -348,10 +335,11 @@ function animate() {
     }
 }
 
-// 全局旋转函数
+// 全局旋转接口：对接 cube.interactions.js
 window.rotateCube = function (x, y) {
-    targetRotation.x += x * 0.4;
-    targetRotation.y += y * 0.4;
+    // 将角度制转换为弧度制并应用
+    currentRotation.x = THREE.MathUtils.degToRad(x);
+    currentRotation.y = THREE.MathUtils.degToRad(y);
 };
 
 // 导出功能到全局

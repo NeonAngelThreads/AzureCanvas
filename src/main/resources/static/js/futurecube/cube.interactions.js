@@ -45,10 +45,12 @@
     
     // ========== 等待画布生成，绑定鼠标事件 ==========
     function bindToCanvas() {
-        const canvas = document.getElementsByTagName('canvas');//document.querySelector('canvas');
+        // 修改点：使用 querySelector 获取单个 canvas 元素，并明确容器
+        const container = document.getElementById('cube-container');
+        const canvas = container ? container.querySelector('canvas') : document.querySelector('canvas');
+        
         if (!canvas) {
             setTimeout(bindToCanvas, 100);
-            console.error("when an error")
             return;
         }
         

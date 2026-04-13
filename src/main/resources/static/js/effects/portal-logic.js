@@ -188,8 +188,8 @@ composer.addPass(new RenderPass(scene, camera));
 const bloomPass = new UnrealBloomPass(
     new THREE.Vector2(window.innerWidth, window.innerHeight),
     1.0,  // [可调参数] 初始辉光强度
-    0.4,  // [可调参数] 辉光半径
-    0.9   // [可调参数] 辉光阈值：值越大，只有越亮的地方才发光
+    0.5,  // [可调参数] 辉光半径
+    0.8   // [可调参数] 辉光阈值：值越大，只有越亮的地方才发光
 );
 composer.addPass(bloomPass);
 
