@@ -41,6 +41,10 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers(("/api/auth/**"))
+                        .ignoringRequestMatchers(("/api/market/**"))
+                        .ignoringRequestMatchers(("/api/storymaps/**"))
+                        .ignoringRequestMatchers(("/api/posts/**"))
+
                         .csrfTokenRepository(new CookieCsrfTokenRepository())
                 )
                 .authorizeHttpRequests(auth -> auth

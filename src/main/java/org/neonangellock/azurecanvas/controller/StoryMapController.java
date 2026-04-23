@@ -59,30 +59,37 @@ public class StoryMapController {
     }
 
     @PostMapping("/storymaps")
-    public ResponseEntity<StoryMapDTO> createStoryMap(@RequestBody Map<String, Object> request) {
-        StoryMap storyMap = new StoryMap();
-        storyMap.setTitle((String) request.get("title"));
-        storyMap.setContent((String) request.get("description"));
-        storyMap.setCoverImageUrl((String) request.get("coverImageUrl"));
-        storyMap.setAuthorId(getCurrentUser().getUserId());
-        storyMap.setCreatedAt(OffsetDateTime.now());
-        storyMap.setUpdatedAt(OffsetDateTime.now());
+    public ResponseEntity<?> createStoryMap(@RequestBody Map<String, Object> request) {
+        User user = getCurrentUser();
 
-        StoryMapLocation location = new StoryMapLocation();
-        location.setStoryMap(storyMap);
-        location.setLng(new BigDecimal(String.valueOf(request.get("lng"))));
-        location.setLat(new BigDecimal(String.valueOf(request.get("lat"))));
-        location.setCreatedAt(OffsetDateTime.now());
-        location.setUpdatedAt(OffsetDateTime.now());
-        location.setTitle((String) request.get("title"));
-        location.setDescription((String) request.get("description"));
-        storyMap.setLocations(List.of(location));
-        
-        StoryMap saved = service.save(storyMap);
+        if (user != null) {
+            StoryMap storyMap = new StoryMap();
+            storyMap.setTitle((String) request.get("title"));
+            storyMap.setContent((String) request.get("description"));
+            storyMap.setCoverImageUrl((String) request.get("coverImageUrl"));
+            storyMap.setAuthorId(user.getUserId());
+            storyMap.setCreatedAt(OffsetDateTime.now());
+            storyMap.setUpdatedAt(OffsetDateTime.now());
 
-        System.out.println(";map"+storyMap);
-        System.out.println("location"+location);
-        return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(saved));
+            StoryMapLocation location = new StoryMapLocation();
+            location.setStoryMap(storyMap);
+            location.setLng(new BigDecimal(String.valueOf(request.get("lng"))));
+            location.setLat(new BigDecimal(String.valueOf(request.get("lat"))));
+            location.setCreatedAt(OffsetDateTime.now());
+            location.setUpdatedAt(OffsetDateTime.now());
+            location.setTitle((String) request.get("title"));
+            location.setDescription((String) request.get("description"));
+            storyMap.setLocations(List.of(location));
+
+            StoryMap saved = service.save(storyMap);
+
+            System.out.println(";map" + storyMap);
+            System.out.println("location" + location);
+            return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(saved));
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "NOT_LOGGED_IN", "redirect", "/login/index.html?redirect=/storymap/compusmap.html"));
+        }
     }
 
     @PutMapping("/storymaps/{storyMapId}")

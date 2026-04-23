@@ -219,6 +219,7 @@ detailModal.addEventListener('click', function (e) {
 function openPublish() {
     publishModal.classList.remove('hidden');
     publishModal.classList.add('flex');
+    submit_logic();
 }
 
 function closePublish() {
@@ -290,7 +291,7 @@ publishForm.addEventListener('submit', async function (e) {
 
         if (response.status === 401) {
             showToast('请先登录');
-            window.location.href = '/login?redirect=/trade';
+            window.location.href = '/login?redirect=/azure_trade/trade';
             return;
         }
     } catch (err) {
@@ -477,10 +478,69 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (dropdownFav) dropdownFav.textContent = user.favorites || 0;
         } else {
             if (response.status === 401) {
-                window.location.href = '/login?redirect=/trade';
+                window.location.href = '/login?redirect=/azure_trade/trade';
             }
         }
     } catch (error) {
         console.error("获取用户信息失败:", error);
     }
 });
+
+
+const submit_logic = function () {
+    document.getElementById('publish-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const title = document.getElementById('itemTitle').value;
+        const category = document.getElementById('itemCategory').value;
+        const description = document.getElementById('itemDescription').value;
+        const price = parseFloat(document.getElementById('itemPrice').value);
+        const condition = parseInt(document.getElementById('itemCondition').value);
+        const location = document.getElementById('itemLocation').value;
+        const isUrgent = document.getElementById('isUrgent').checked;
+        const isShippingFree = document.getElementById('isShippingFree').checked;
+        const canInspect = document.getElementById('canInspect').checked;
+        // For images, you would typically upload them separately or use FormData
+        // For now, we'll send an empty array or placeholder if the API expects it.
+
+        if (!title || !category || !description || isNaN(price) || isNaN(condition)) {
+            window.notify.show('请填写所有必填项！', 'warning');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/market/items', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // 'X-XSRF-TOKEN': window.getCsrfToken()
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    title: title,
+                    category: category,
+                    description: description,
+                    price: price,
+                    condition: condition, // Assuming backend handles this
+                    location: location,
+                    isUrgent: isUrgent, // Assuming backend handles this
+                    isShippingFree: isShippingFree, // Assuming backend handles this
+                    canInspect: canInspect, // Assuming backend handles this
+                    images: [] // Placeholder for images
+                })
+            });
+
+            if (response.ok) {
+                console.error('商品上架成功！', 'success');
+                closePublish();
+                // Optionally clear form or refresh item list
+                document.getElementById('publish-form').reset();
+            } else {
+                const errorData = await response.json();
+                console.error(`上架失败: ${errorData.message || response.statusText}`, 'error');
+            }
+        } catch (error) {
+            console.error('Error submitting item:', error);
+        }
+    });
+}

@@ -9,6 +9,7 @@ import org.neonangellock.azurecanvas.service.IMarketService;
 import org.neonangellock.azurecanvas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -64,14 +65,20 @@ public class MarketController {
     }
 
     @PostMapping("/items")
-    public ResponseEntity<ItemDTO> createItem(@RequestBody Map<String, Object> request) {
-        Item item = new Item();
-        item.setTitle((String) request.get("title"));
-        item.setDescription((String) request.get("description"));
-        item.setPrice(new BigDecimal(request.get("price").toString()));
-        item.setCategory((String) request.get("category"));
-        item.setSeller(getCurrentUser());
-        
+    public ResponseEntity<?> createItem(@RequestBody Map<String, Object> request) {
+        User user = getCurrentUser();
+        Item item;
+        if (user != null) {
+            item = new Item();
+            item.setTitle((String) request.get("title"));
+            item.setDescription((String) request.get("description"));
+            item.setPrice(new BigDecimal(request.get("price").toString()));
+            item.setCategory((String) request.get("category"));
+            item.setSeller(user);
+        }else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "not logged in", "redirect", "/login/index.html?redirect=/azure_trade/trade.html"));
+        }
+
         Item savedItem = marketService.saveItem(item);
         return ResponseEntity.ok(convertToDTO(savedItem));
     }

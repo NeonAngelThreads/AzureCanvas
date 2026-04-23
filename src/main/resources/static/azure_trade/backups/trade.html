@@ -559,36 +559,36 @@
                 <button onclick="closePublish()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
             </div>
             <!-- 表单内容（可滚动） -->
-            <form id="publish-form" class="px-8 py-6 space-y-8 overflow-y-auto flex-1">
+            <form id="publishForm" class="px-8 py-6 space-y-8 overflow-y-auto flex-1">
     
     <div class="space-y-5">
         <h3 class="text-sm font-bold text-purple-600 border-b border-purple-50 pb-2">核心信息</h3>
         
         <div>
-            <label class="block text-sm text-gray-600 mb-2">商品名称 <span class="text-red-500">*</span></label>
-            <input type="text" name="title" id="itemTitle" required placeholder="请填写商品标题，如：iPad Pro 11寸 2022款"
+            <label for="itemTitle" class="block text-sm text-gray-600 mb-2">商品名称 <span class="text-red-500">*</span></label>
+            <input type="text" id="itemTitle" name="title" required placeholder="请填写商品标题，如：iPad Pro 11寸 2022款" 
                 class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-purple-400 outline-none transition">
         </div>
 
         <div>
-            <label class="block text-sm text-gray-600 mb-2">商品类型 <span class="text-red-500">*</span></label>
-            <select name="category" id="itemCategory" required
+            <label for="itemCategory" class="block text-sm text-gray-600 mb-2">商品类型 <span class="text-red-500">*</span></label>
+            <select id="itemCategory" name="category" required 
                 class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-purple-400 outline-none bg-white">
                 <option value="">请选择分类</option>
-                <option>手机/数码/电脑</option>
-                <option>教材/考研/资料</option>
-                <option>服饰/箱包/运动</option>
-                <option>游戏/卡券/潮玩</option>
-                <option>家具/家电/日用</option>
-                <option>美妆/护肤/个护</option>
-                <option>乐器/文具/手工</option>
-                <option>代步/租赁/其他</option>
+                <option value="手机/数码/电脑">手机/数码/电脑</option>
+                <option value="教材/考研/资料">教材/考研/资料</option>
+                <option value="服饰/箱包/运动">服饰/箱包/运动</option>
+                <option value="游戏/卡券/潮玩">游戏/卡券/潮玩</option>
+                <option value="家具/家电/日用">家具/家电/日用</option>
+                <option value="美妆/护肤/个护">美妆/护肤/个护</option>
+                <option value="乐器/文具/手工">乐器/文具/手工</option>
+                <option value="代步/租赁/其他">代步/租赁/其他</option>
             </select>
         </div>
 
         <div>
-            <label class="block text-sm text-gray-600 mb-2">商品描述 <span class="text-red-500">*</span></label>
-            <textarea name="description" id="itemDescription" rows="4" placeholder="描述一下宝贝的来源、成色细节、转让原因..."
+            <label for="itemDescription" class="block text-sm text-gray-600 mb-2">商品描述 <span class="text-red-500">*</span></label>
+            <textarea id="itemDescription" name="description" rows="4" placeholder="描述一下宝贝的来源、成色细节、转让原因..." 
                 class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-purple-400 outline-none resize-none transition"></textarea>
         </div>
 
@@ -596,7 +596,7 @@
             <label class="block text-sm text-gray-600 mb-2">宝贝图片</label>
             <div class="flex flex-wrap gap-3">
                 <label class="w-24 h-24 rounded-lg bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:bg-purple-50 hover:border-purple-200 transition">
-                    <input type="file" id="publish-images" name="images" accept="image/*" multiple class="hidden">
+                    <input type="file" id="itemImages" name="images" accept="image/*" multiple class="hidden">
                     <span class="text-gray-400 text-2xl">+</span>
                     <span class="text-[10px] text-gray-400 mt-1">添加图片</span>
                 </label>
@@ -609,20 +609,20 @@
         <h3 class="text-sm font-bold text-purple-600 border-b border-purple-50 pb-2">定价与交易</h3>
         
         <div>
-            <label class="block text-sm text-gray-600 mb-2">商品定价 (元) <span class="text-red-500">*</span></label>
-            <input type="number" name="price" id="itemPrice" step="0.01" required placeholder="0.00"
+            <label for="itemPrice" class="block text-sm text-gray-600 mb-2">商品定价 (元) <span class="text-red-500">*</span></label>
+            <input type="number" id="itemPrice" name="price" step="0.01" required placeholder="0.00" 
                 class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-purple-400 outline-none">
         </div>
 
         <div>
-            <label class="block text-sm text-gray-600 mb-2">成色 (0-100全新) <span class="text-red-500">*</span></label>
-            <input type="number" name="condition" id="itemCondition" min="0" max="100" required placeholder="例如：95"
+            <label for="itemCondition" class="block text-sm text-gray-600 mb-2">成色 (0-100全新) <span class="text-red-500">*</span></label>
+            <input type="number" id="itemCondition" name="condition" min="0" max="100" required placeholder="例如：95" 
                 class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-purple-400 outline-none">
         </div>
 
         <div>
-            <label class="block text-sm text-gray-600 mb-2">交易地点</label>
-            <input type="text" id="itemLocation" name="address" placeholder="如：南区宿舍、图书馆正门"
+            <label for="itemLocation" class="block text-sm text-gray-600 mb-2">交易地点</label>
+            <input type="text" id="itemLocation" name="address" placeholder="如：南区宿舍、图书馆正门" 
                 class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-purple-400 outline-none">
         </div>
     </div>
@@ -661,7 +661,7 @@
     </div>
 
     <div class="pt-4 pb-2">
-        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl transition shadow-lg transform active:scale-[0.98]">
+        <button type="submit" id="submitItemBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl transition shadow-lg transform active:scale-[0.98]">
             确认上架
         </button>
     </div>
@@ -674,5 +674,64 @@
 
     <script src="../js/app/seeds.js"></script>
     <script src="../js/app/trade.js"></script>
+    <script src="../js/notifications.js"></script>
+    <script>
+        // Publish Item Modal Logic
+        document.getElementById('publishForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById('itemTitle').value;
+            const category = document.getElementById('itemCategory').value;
+            const description = document.getElementById('itemDescription').value;
+            const price = parseFloat(document.getElementById('itemPrice').value);
+            const condition = parseInt(document.getElementById('itemCondition').value);
+            const location = document.getElementById('itemLocation').value;
+            const isUrgent = document.getElementById('isUrgent').checked;
+            const isShippingFree = document.getElementById('isShippingFree').checked;
+            const canInspect = document.getElementById('canInspect').checked;
+            // For images, you would typically upload them separately or use FormData
+            // For now, we'll send an empty array or placeholder if the API expects it.
+
+            if (!title || !category || !description || isNaN(price) || isNaN(condition)) {
+                window.notify.show('请填写所有必填项！', 'warning');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/market/items', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-XSRF-TOKEN': window.getCsrfToken()
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        category: category,
+                        description: description,
+                        price: price,
+                        condition: condition, // Assuming backend handles this
+                        location: location,
+                        isUrgent: isUrgent, // Assuming backend handles this
+                        isShippingFree: isShippingFree, // Assuming backend handles this
+                        canInspect: canInspect, // Assuming backend handles this
+                        images: [] // Placeholder for images
+                    })
+                });
+
+                if (response.ok) {
+                    window.notify.show('商品上架成功！', 'success');
+                    closePublish();
+                    // Optionally clear form or refresh item list
+                    document.getElementById('publishForm').reset();
+                } else {
+                    const errorData = await response.json();
+                    window.notify.show(`上架失败: ${errorData.message || response.statusText}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error submitting item:', error);
+                window.notify.show('网络错误，上架失败。', 'error');
+            }
+        });
+    </script>
 </body>
 </html>

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.time.OffsetDateTime;
 
@@ -36,13 +38,15 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String bio;
 
+    @Enumerated(EnumType.STRING)
+    private Gender gender = Gender.PRIVATE;
+
     @CreationTimestamp
     @Column(name = "joinedAt", nullable = false, updatable = false)
     private OffsetDateTime joinedAt;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
+    @Column(name = "birth")
+    private Date birthDate;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
@@ -55,5 +59,9 @@ public class User {
 
     public enum Role {
         user, moderator, admin
+    }
+
+    public enum Gender {
+        MALE, FEMALE, PRIVATE
     }
 }

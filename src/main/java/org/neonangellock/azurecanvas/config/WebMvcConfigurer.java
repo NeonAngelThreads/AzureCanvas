@@ -9,6 +9,7 @@ public class WebMvcConfigurer implements org.springframework.web.servlet.config.
     @Override
     public void addCorsMappings(CorsRegistry registry){
         registry.addMapping("/**")
+                .allowedOrigins("http://localhost:8088")
                 .allowCredentials(true)
                 .allowedOriginPatterns("*")
                 .allowedMethods("GET", "POST", "DELETE", "PUT", "OPTION")

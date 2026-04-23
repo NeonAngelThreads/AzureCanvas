@@ -524,7 +524,7 @@ if (cachedProfile) applyProfileToPage(cachedProfile);
             saveProfileToStorage(user);
             applyProfileToPage(user);
         } else if (response.status === 401) {
-            window.location.href = '/login?redirect=/trade';
+            window.location.href = '/login?redirect=/azure_trade/trade';
         }
     } catch (err) {
         console.error('获取用户信息失败:', err);
@@ -541,7 +541,7 @@ if (logoutBtn) {
                 credentials: 'include'
             });
         } catch (e) {}
-        window.location.href = '/login?redirect=/trade';
+        window.location.href = '/login?redirect=/azure_trade/trade';
     });
 }
 

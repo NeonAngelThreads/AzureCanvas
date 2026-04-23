@@ -42,7 +42,7 @@ public class UsersController {
         userData.put("avatar", user.getAvatarUrl());
         userData.put("role", user.getRole().name());
         userData.put("isRobot", user.isRobot());
-        userData.put("createdAt", user.getCreatedAt());
+        userData.put("createdAt", user.getJoinedAt());
         userData.put("postsCount", 0);
         userData.put("followersCount", 0);
         userData.put("followingCount", 0);
@@ -88,9 +88,19 @@ public class UsersController {
         response.put("avatar", user.getAvatarUrl());
         response.put("role", user.getRole().name());
         response.put("isRobot", user.isRobot());
-        response.put("createdAt", user.getCreatedAt());
+        response.put("createdAt", user.getJoinedAt());
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("{uuid}")
+    public ResponseEntity<?> getUserProfileById(@PathVariable UUID uuid){
+        User user = userService.findById(uuid);
+
+        if (user != null){
+            return ResponseEntity.ok(user);
+        }
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/me/posts")

@@ -261,7 +261,7 @@
             try {
                 await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
             } catch (e) {}
-            window.location.href = '/login?redirect=/trade';
+            window.location.href = '/login?redirect=/azure_trade/trade';
         });
     }
 

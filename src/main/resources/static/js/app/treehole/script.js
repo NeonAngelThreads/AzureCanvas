@@ -25,11 +25,7 @@
   const imagePreviewContainer = document.getElementById('imagePreviewContainer');
   const emojiToggleBtn = document.getElementById('emojiToggleBtn');
   const emojiPicker = document.getElementById('emojiPicker');
-   // 简单的页面切换逻辑
-    const newPostBtn = document.getElementById('newPostBtn');
-    const cancelPublishBtn = document.getElementById('cancelPublishBtn');
-    const homeView = document.getElementById('homeView');
-    const publishView = document.getElementById('publishView');
+
   // ---------- 初始化 Mock 数据 ----------
   function initMockPosts() {
     const saved = localStorage.getItem('campus_treehole_posts');
@@ -425,27 +421,3 @@
   // 处理空状态
   if (posts.length === 0) emptyFeedMsg.style.display = 'block';
 })();
-
-// 切换到发布界面
-document.getElementById('newPostBtn').addEventListener('click', function() {
-    document.getElementById('homeView').classList.add('hidden');
-    document.getElementById('publishView').classList.remove('hidden');
-});
-
-// 返回首页
-document.getElementById('cancelPublishBtn').addEventListener('click', function() {
-    document.getElementById('publishView').classList.add('hidden');
-    document.getElementById('homeView').classList.remove('hidden');
-});
-
-// 点击右上角发布按钮
-    newPostBtn.addEventListener('click', () => {
-        homeView.classList.add('hidden');
-        publishView.classList.remove('hidden');
-    });
-
-    // 点击关闭/取消
-    cancelPublishBtn.addEventListener('click', () => {
-        publishView.classList.add('hidden');
-        homeView.classList.remove('hidden');
-    });

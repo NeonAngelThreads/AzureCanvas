@@ -34,6 +34,7 @@ class LaserTunnel {
         this.currentTunnelZ = 0;
         this.tunnelSegments = [];
         this.lasers = [];
+        this.cameraSpeed = 15;
         
         this.init();
     }
@@ -316,7 +317,7 @@ class LaserTunnel {
         const time = this.clock.getElapsedTime();
 
         // Continuous camera movement
-        this.camera.position.z -= delta * 15;
+        this.camera.position.z -= delta * this.cameraSpeed;
         this.camera.rotation.z = Math.sin(time * 0.1) * 0.05;
 
         // Generate new segments if not logged in
