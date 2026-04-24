@@ -143,7 +143,6 @@ public class EsTreeHoleServiceImpl implements EsTreeHoleService {
                 throw new IndexOutOfBoundsException();
             }
 
-            @Override
             public List<EsTreeHole> getSearchHitsContents() {
                 return Collections.emptyList();
             }
@@ -158,7 +157,6 @@ public class EsTreeHoleServiceImpl implements EsTreeHoleService {
                 return null;
             }
 
-            @Override
             public <T> T getAggregation(String name, Class<T> aClass) {
                 return null;
             }

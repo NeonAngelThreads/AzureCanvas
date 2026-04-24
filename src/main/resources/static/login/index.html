@@ -344,7 +344,42 @@
             box-shadow: none;
         }
 
-        /* Activating Profile Screen (Fallback if 3D fails) */
+        /* Status Overlays */
+        #status-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            background: radial-gradient(circle at center, rgba(0,255,136,0.1) 0%, transparent 70%);
+        }
+        .status-main {
+            font-family: 'Aeonik', 'Segoe UI', sans-serif;
+            font-weight: 900;
+            font-size: 80px;
+            letter-spacing: 20px;
+            text-transform: uppercase;
+            color: #00ff88;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.8), 0 0 40px rgba(0, 255, 136, 0.4);
+            margin-bottom: 10px;
+            transform: scale(1.1);
+        }
+        .status-sub {
+            font-size: 18px;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 300;
+        }
+
+        /* Activating Profile Screen */
         #activating-screen {
             position: fixed;
             top: 0;
@@ -352,11 +387,18 @@
             width: 100%;
             height: 100%;
             background: white;
-            z-index: 200;
+            z-index: 2000;
             display: none;
             align-items: center;
             justify-content: center;
             opacity: 0;
+        }
+        .activating-text {
+            color: #000;
+            font-size: 60px;
+            font-weight: 900;
+            letter-spacing: 25px;
+            text-transform: uppercase;
         }
 
         /* 3D Exit Animation */
@@ -377,104 +419,110 @@
     </style>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="importmap">
-    {
-        "imports": {
-            "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
-            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
-            "gsap": "https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js",
-            "troika-three-text": "https://esm.sh/troika-three-text@0.47.1?external=three"
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
+                "gsap": "https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js"
+            }
         }
-    }
     </script>
 </head>
 <body>
-    <!-- 预加载动画页面 -->
-    <div id="preloader">
-        <div class="preloader-content">
-            <div id="preloader-canvas-container"></div>
-            <div class="loading-text-wrapper">
-                <span class="loading-label">Loading</span>
-                <span id="loading-percentage">0%</span>
-            </div>
-            <div class="progress-bar-container">
-                <div id="progress-bar-fill"></div>
-            </div>
-            <div id="loading-status">Initializing environment...</div>
+<!-- 预加载动画页面 -->
+<div id="preloader">
+    <div class="preloader-content">
+        <div id="preloader-canvas-container"></div>
+        <div class="loading-text-wrapper">
+            <span class="loading-label">Loading</span>
+            <span id="loading-percentage">0%</span>
         </div>
+        <div class="progress-bar-container">
+            <div id="progress-bar-fill"></div>
+        </div>
+        <div id="loading-status">Initializing environment...</div>
     </div>
+</div>
 
-    <div id="canvas-container"></div>
-    
-    <div class="login-overlay">
-        <form class="login-card" id="auth-form">
-            <h1 id="form-title">AZURE CANVAS</h1>
-            
-            <div class="form-content">
+<div id="canvas-container"></div>
+
+<div class="login-overlay">
+    <form class="login-card" id="auth-form">
+        <h1 id="form-title">AZURE CANVAS</h1>
+
+        <div class="form-content">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="username" placeholder="Enter your username" required>
+            </div>
+
+            <div class="register-fields">
                 <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="username" placeholder="Enter your username" required>
-                </div>
-
-                <div class="register-fields">
-                    <div class="form-group">
-                        <label>Email Address</label>
-                        <input type="email" id="email" placeholder="Enter your email">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="password" placeholder="Enter your password" required>
-                </div>
-
-                <div class="register-fields">
-                    <div class="form-group">
-                        <label>Confirm Password</label>
-                        <input type="password" id="confirm-password" placeholder="Confirm your password">
-                    </div>
-                </div>
-
-                <div class="login-footer">
-                    <div class="checkbox" id="remember-me-container">
-                        <input type="checkbox" id="inputcheckbox">
-                        <label for="inputcheckbox">Remember Me</label>
-                    </div>
-                    <span class="toggle-auth" id="toggle-auth-btn">Create Account</span>
+                    <label>Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email">
                 </div>
             </div>
 
-            <button type="submit" class="login-btn" id="submit-btn">ENTER SYSTEM</button>
-        </form>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+            </div>
+
+            <div class="register-fields">
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="confirm-password" placeholder="Confirm your password">
+                </div>
+            </div>
+
+            <div class="login-footer">
+                <div class="checkbox" id="remember-me-container">
+                    <input type="checkbox" id="inputcheckbox">
+                    <label for="inputcheckbox">Remember Me</label>
+                </div>
+                <span class="toggle-auth" id="toggle-auth-btn">Create Account</span>
+            </div>
+        </div>
+
+        <button type="submit" class="login-btn" id="submit-btn">ENTER SYSTEM</button>
+    </form>
+</div>
+
+<!-- Avatar Selection Dialog -->
+<div id="avatar-dialog">
+    <h2 class="avatar-title">Choose Your Avatar</h2>
+    <p class="avatar-subtitle">You can change it later on</p>
+
+    <div class="avatar-preview-container">
+        <div class="avatar-preview" id="avatar-preview">A</div>
     </div>
 
-    <!-- Avatar Selection Dialog -->
-    <div id="avatar-dialog">
-        <h2 class="avatar-title">Choose Your Avatar</h2>
-        <p class="avatar-subtitle">You can change it later on</p>
-        
-        <div class="avatar-preview-container">
-            <div class="avatar-preview" id="avatar-preview">A</div>
-        </div>
-        
-        <input type="file" id="avatar-upload" hidden accept="image/*">
-        <button class="upload-btn" onclick="document.getElementById('avatar-upload').click()">Upload Photo</button>
-        
-        <div class="dialog-actions">
-            <button class="action-btn btn-skip" id="skip-avatar">Skip</button>
-            <button class="action-btn btn-activate" id="activate-account" disabled>Activate Account</button>
-        </div>
+    <input type="file" id="avatar-upload" hidden accept="image/*">
+    <button class="upload-btn" onclick="document.getElementById('avatar-upload').click()">Upload Photo</button>
+
+    <div class="dialog-actions">
+        <button class="action-btn btn-skip" id="skip-avatar">Skip</button>
+        <button class="action-btn btn-activate" id="activate-account" disabled>Activate Account</button>
     </div>
+</div>
 
-    <!-- Status Overlays -->
-    <div id="activating-screen"></div>
+<!-- Status Overlays -->
+<div id="status-overlay">
+    <div class="status-main" id="status-main">ACCESS GRANTED</div>
+    <div class="status-sub" id="status-sub">Verification Successful</div>
+</div>
 
-    <script src="../js/notifications.js"></script>
-    <script type="module">
-        import { Preloader } from '../js/effects/preloader.js';
-        window.Preloader = Preloader;
-        Preloader.init();
-    </script>
-    <script type="module" src="../js/laserchannel/login-tunnel.js"></script>
-    <script type="module" src="../js/login.logic.js"></script>
+<div id="activating-screen">
+    <div class="activating-text">ACTIVATING PROFILE</div>
+</div>
+
+<script src="../js/notifications.js"></script>
+<script type="module">
+    import { Preloader } from '../js/effects/preloader.js';
+    window.Preloader = Preloader;
+    Preloader.init();
+</script>
+<script type="module" src="../js/laserchannel/login-tunnel.js"></script>
+<script type="module" src="../js/login.logic.js"></script>
 </body>
 </html>

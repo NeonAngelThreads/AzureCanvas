@@ -13,7 +13,7 @@ class LaserTunnel {
     constructor() {
         this.container = document.getElementById('canvas-container');
         this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+        this.camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 2000);
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         this.clock = new THREE.Clock();
         this.audioLoader = new THREE.AudioLoader();
@@ -22,7 +22,7 @@ class LaserTunnel {
         
         this.params = {
             tunnelRadius: 8,
-            tunnelLength: 200,
+            tunnelLength: 300,
             spiralTurns: 6,
             bloomStrength: 2.0,
             bloomRadius: 0.5,

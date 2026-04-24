@@ -165,7 +165,6 @@ public class EsItemServiceImpl implements EsItemService {
                 throw new IndexOutOfBoundsException();
             }
 
-            @Override
             public List<EsItem> getSearchHitsContents() {
                 return Collections.emptyList();
             }
@@ -180,7 +179,6 @@ public class EsItemServiceImpl implements EsItemService {
                 return null;
             }
 
-            @Override
             public <T> T getAggregation(String name, Class<T> aClass) {
                 return null;
             }

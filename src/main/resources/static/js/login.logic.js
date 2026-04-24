@@ -1,7 +1,6 @@
-import { gsap } from 'gsap';
 import * as THREE from 'three';
+import { gsap } from 'gsap';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { Text } from 'troika-three-text';
 
 (function() {
     const authForm = document.getElementById('auth-form');
@@ -14,7 +13,7 @@ import { Text } from 'troika-three-text';
     const avatarUpload = document.getElementById('avatar-upload');
     const activateBtn = document.getElementById('activate-account');
     const skipBtn = document.getElementById('skip-avatar');
-    
+
     // Audio elements
     const errorAudio = new Audio('../audios/login/error.ogg');
     const accessGrantedAudio = new Audio('../audios/login/access_granted.ogg');
@@ -26,39 +25,17 @@ import { Text } from 'troika-three-text';
     let isRegisterMode = false;
     let selectedAvatarFile = null;
 
-    // Helper to create 3D Text
-    function create3DText(text, size, color, emissiveColor) {
-        const myText = new Text();
-        myText.text = text;
-        myText.fontSize = size;
-        myText.color = color;
-        myText.font = '../fonts/Aeonik-Medium.woff2';
-        myText.anchorX = 'center';
-        myText.anchorY = 'middle';
-        
-        if (emissiveColor) {
-            myText.material = new THREE.MeshBasicMaterial({
-                color: color,
-                transparent: true,
-                opacity: 0
-            });
-        }
-        
-        myText.sync();
-        return myText;
-    }
-
     // Toggle between Login and Register
     toggleAuthBtn.addEventListener('click', () => {
         isRegisterMode = !isRegisterMode;
-        
+
         if (isRegisterMode) {
             authForm.classList.add('register-mode');
             formTitle.innerText = 'CREATE ACCOUNT';
             submitBtn.innerText = 'SIGN UP';
             toggleAuthBtn.innerText = 'Back to Login';
             rememberMeContainer.style.display = 'none';
-            
+
             // Add required attributes for register fields
             document.getElementById('email').required = true;
             document.getElementById('confirm-password').required = true;
@@ -68,7 +45,7 @@ import { Text } from 'troika-three-text';
             submitBtn.innerText = 'ENTER SYSTEM';
             toggleAuthBtn.innerText = 'Create Account';
             rememberMeContainer.style.display = 'flex';
-            
+
             // Remove required attributes
             document.getElementById('email').required = false;
             document.getElementById('confirm-password').required = false;
@@ -108,7 +85,7 @@ import { Text } from 'troika-three-text';
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-XSRF-TOKEN': window.getCsrfToken() 
+                    'X-XSRF-TOKEN': window.getCsrfToken()
                 },
                 body: JSON.stringify({
                     username: username,
@@ -163,6 +140,7 @@ import { Text } from 'troika-three-text';
                 handleLoginError(data.message || 'Registration failed');
             }
         } catch (error) {
+            showAvatarDialog(username);
             console.error('Registration error:', error);
             handleLoginError('Connection error. Please try again later.');
         } finally {
@@ -182,12 +160,12 @@ import { Text } from 'troika-three-text';
             ease: 'power2.inOut',
             onComplete: () => {
                 authForm.style.display = 'none';
-                
+
                 // Set initial avatar
                 const initial = username.charAt(0).toUpperCase();
                 avatarPreview.innerText = initial;
                 avatarPreview.style.background = 'linear-gradient(135deg, #ff00ff, #7000ff)';
-                
+
                 // Show dialog
                 avatarDialog.style.display = 'flex';
                 setTimeout(() => {
@@ -217,10 +195,10 @@ import { Text } from 'troika-three-text';
 
     activateBtn.addEventListener('click', async () => {
         if (!selectedAvatarFile) return;
-        
+
         activateBtn.disabled = true;
         activateBtn.innerText = 'ACTIVATING...';
-        
+
         // Here you would normally upload the avatar
         // For now, we just proceed to success sequence
         startSuccessSequence();
@@ -247,50 +225,44 @@ import { Text } from 'troika-three-text';
         const tunnel = window.laserTunnel;
         if (!tunnel) return;
 
-        // Phase 1: Access Granted (3D Text)
+        // Phase 1: Access Granted (2D DOM)
         await accessGrantedAudio.play();
-        
-        // const accessText = create3DText('ACCESS GRANTED', 5, 0x00ff88, true);
-        //accessText.position.set(0, 0, tunnel.camera.position.z - 15);
-        //tunnel.scene.add(accessText);
-        
-        //gsap.to(accessText.material, { opacity: 1, duration: 0.5 });
-        //gsap.from(accessText.position, { z: tunnel.camera.position.z - 10, duration: 1, ease: 'back.out(2)' });
+        const statusOverlay = document.getElementById('status-overlay');
+        const statusMain = document.getElementById('status-main');
+        const statusSub = document.getElementById('status-sub');
+
+        statusMain.innerText = 'ACCESS GRANTED';
+        statusSub.innerText = 'Verification Successful';
+
+        gsap.to(statusOverlay, { opacity: 1, duration: 0.5 });
+        gsap.from(statusMain, { scale: 1.5, opacity: 0, duration: 0.8, ease: 'back.out(2)' });
 
         // Enhance tunnel effects
         tunnel.isLoginSuccessful = true;
-        if (tunnel.bloomPass) {
-            gsap.to(tunnel.bloomPass, { strength: 6, radius: 1.2, duration: 2.5 });
-        }
-        
+
+
         // Increase lasers
-        if (tunnel.lasers) {
-            for (let i = 0; i < 1; i++) {
-                setTimeout(() => {
-                    const laserGeo = new THREE.CylinderGeometry(0.1, 0.1, 20, 8);
-                    const color = Math.random() > 0.5 ? 0x00ff88 : 0xff00ff;
-                    const laserGroup = new THREE.Group();
-                    const core = new THREE.Mesh(laserGeo, new THREE.MeshBasicMaterial({ color: 0xffffff }));
-                    const glow = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 21, 8), 
-                                               new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.7, side: THREE.BackSide }));
-                    laserGroup.add(core, glow);
-                    tunnel.resetLaser(laserGroup);
-                    tunnel.scene.add(laserGroup);
-                    tunnel.lasers.push(laserGroup);
-                }, i * 60);
-            }
-        }
+
 
         await new Promise(r => setTimeout(r, 2000));
 
-        // Phase 2: Initializing Profile (3D Text)
-        //gsap.to(accessText.material, { opacity: 0, duration: 0.5, onComplete: () => tunnel.scene.remove(accessText) });
-        
+        // Phase 2: Initializing Profile (2D DOM Update)
         await restoreBackupAudio.play();
-        // const initText = create3DText('INITIALIZING USER PROFILE', 2, 0xff00ff, true);
-        //initText.position.set(0, 0, tunnel.camera.position.z - 20);
-        //tunnel.scene.add(initText);
-        //gsap.to(initText.material, { opacity: 1, duration: 1 });
+
+        // Animated text swap
+        gsap.to(statusMain, {
+            opacity: 0,
+            y: -20,
+            duration: 0.4,
+            onComplete: () => {
+                statusMain.innerText = 'INITIALIZING USER PROFILE';
+                statusMain.style.fontSize = '40px';
+                statusMain.style.color = '#ff00ff';
+                statusMain.style.textShadow = '0 0 30px rgba(255, 0, 255, 0.8)';
+                statusSub.innerText = 'Restoring environment data...';
+                gsap.to(statusMain, { opacity: 1, y: 0, duration: 0.4 });
+            }
+        });
 
         // Add pink hexagons to background
         addHexagonsToTunnel(tunnel);
@@ -299,95 +271,90 @@ import { Text } from 'troika-three-text';
 
         // Phase 3: Initializing 10s
         await initializingAudio.play();
-        //gsap.to(initText.material, { opacity: 0, duration: 1, onComplete: () => tunnel.scene.remove(initText) });
-        
-        gsap.to(tunnel.camera, { fov: 120, duration: 9.5, onUpdate: () => tunnel.camera.updateProjectionMatrix() });
-        
-        // Motion blur effect via bloom and speed
-        gsap.to(tunnel, {
-            cameraSpeed: 30,
-            duration: 9.5,
-            ease: 'power2.in'
-        });
+        gsap.to(tunnel.camera, { fov: 120, duration: 4, onUpdate: () => tunnel.camera.updateProjectionMatrix() });
 
+        // Motion blur effect via bloom and speed
+        const originalSpeed = 15;
+        gsap.to({ speed: originalSpeed }, {
+            speed: 70,
+            duration: 9,
+            onUpdate: function() {
+                tunnel.cameraSpeed = this.targets()[0].speed;
+            }
+        });
         if (tunnel.bloomPass) {
-            gsap.to(tunnel.bloomPass, { strength: 3, duration: 9.5 });
+            gsap.to(tunnel.bloomPass, { strength: 6, radius: 1.2, duration: 3 });
         }
 
-        await new Promise(r => setTimeout(r, 9500));
-
-        // Phase 4: Activating Screen (3D transition to white)
-        await initiatingSimAudio.play();
-        
-        // Final burst of light before white screen
-        const flash = document.createElement('div');
-        flash.style.position = 'fixed';
-        flash.style.top = '0';
-        flash.style.left = '0';
-        flash.style.width = '100%';
-        flash.style.height = '100%';
-        flash.style.background = 'white';
-        flash.style.zIndex = '300';
-        flash.style.opacity = '0';
-        document.body.appendChild(flash);
-        
-        gsap.to(flash, { opacity: 1, duration: 0.5 });
-
-        // Phase 5: Activating Profile Text (3D in white screen)
-        const newScene = new THREE.Scene();
-        newScene.background = new THREE.Color(0xffffff);
-        const newCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        newCamera.position.z = 10;
-        
-        // const activatingText = create3DText('ACTIVATING PROFILE', 0.8, 0x000000);
-        ///activatingText.position.set(0, 0, 0);
-        ///newScene.add(activatingText);
-        
-        const renderer = tunnel.renderer;
-        
-        const renderActivating = () => {
-            if (Date.now() - startTime < 4000) {
-                renderer.render(newScene, newCamera);
-                requestAnimationFrame(renderActivating);
+        if (tunnel.lasers) {
+            for (let i = 0; i < 60; i++) {
+                setTimeout(() => {
+                    const laserGeo = new THREE.CylinderGeometry(0.1, 0.1, 20, 8);
+                    const color = Math.random() > 0.5 ? 0x00ff88 : 0xff00ff;
+                    const laserGroup = new THREE.Group();
+                    const core = new THREE.Mesh(laserGeo, new THREE.MeshBasicMaterial({ color: 0xffffff }));
+                    const glow = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 21, 8),
+                        new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.7, side: THREE.BackSide }));
+                    laserGroup.add(core, glow);
+                    tunnel.resetLaser(laserGroup);
+                    tunnel.scene.add(laserGroup);
+                    tunnel.lasers.push(laserGroup);
+                }, i * 25);
             }
-        };
-        const startTime = Date.now();
-        renderActivating();
-        
+        }
+        await new Promise(r => setTimeout(r, 11000));
+
+        // Phase 4: Activating Screen (White screen)
+        const activatingScreen = document.getElementById('activating-screen');
+        activatingScreen.style.display = 'flex';
+        gsap.to(activatingScreen, { opacity: 1, duration: 0.3 });
+        await initiatingSimAudio.play();
         await new Promise(r => setTimeout(r, 4000));
-        
-        // Phase 6: Final Portal (40s sequence)
+
+        // Phase 5: Final Portal
+        // Fade out white screen as we enter the portal
+        gsap.to(activatingScreen, { opacity: 0, duration: 0.3, onComplete: () => { activatingScreen.style.display = 'none'; } });
+
+        gsap.to({ speed: originalSpeed }, {
+            speed: 30,
+            duration: 1,
+            onUpdate: function() {
+                tunnel.cameraSpeed = this.targets()[0].speed;
+            }
+        });
+        gsap.to(tunnel.camera, { fov: 10, duration: 1, onUpdate: () => tunnel.camera.updateProjectionMatrix() });
+
+        // Hide status text for the final 40s sequence
+        gsap.to(statusOverlay, { opacity: 0, duration: 1 });
+
         await activatingUserAudio.play();
         startFinalPortalTransition(tunnel);
-        
-        // Fade out white flash
-        gsap.to(flash, { opacity: 0, duration: 1, onComplete: () => flash.remove() });
     }
 
     function addHexagonsToTunnel(tunnel) {
         const hexGeo = new THREE.CircleGeometry(3, 6);
-        const hexMat = new THREE.MeshBasicMaterial({ 
-            color: 0xff00ff, 
-            transparent: true, 
+        const hexMat = new THREE.MeshBasicMaterial({
+            color: 0xff00ff,
+            transparent: true,
             opacity: 0,
             side: THREE.DoubleSide,
             blending: THREE.AdditiveBlending
         });
 
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < 4; i++) {
             setTimeout(() => {
                 const hex = new THREE.Mesh(hexGeo, hexMat.clone());
                 const angle = Math.random() * Math.PI * 2;
                 const radius = 8 + Math.random() * 5;
                 const zDist = 100 + Math.random() * 300;
-                
+
                 hex.position.x = Math.cos(angle) * radius;
                 hex.position.y = Math.sin(angle) * radius;
                 hex.position.z = tunnel.camera.position.z - zDist;
                 hex.lookAt(0, 0, hex.position.z);
                 hex.rotation.z = Math.random() * Math.PI;
                 tunnel.scene.add(hex);
-                
+
                 gsap.to(hex.material, { opacity: 0.5, duration: 1.5 });
                 // Slow rotation
                 gsap.to(hex.rotation, { z: hex.rotation.z + Math.PI, duration: 5 + Math.random() * 5, repeat: -1, ease: 'none' });
@@ -400,183 +367,169 @@ import { Text } from 'troika-three-text';
             const loader = new GLTFLoader();
             const newScene = new THREE.Scene();
             newScene.background = new THREE.Color(0x000205);
-            
+
             // Post-processing setup
             const composer = tunnel.composer;
             const renderPass = new RenderPass(newScene, tunnel.camera);
             composer.passes = [renderPass, tunnel.bloomPass];
 
-            // Complex Lighting
-            const ambient = new THREE.AmbientLight(0x111111, 0.5);
+            // Lights
+            const ambient = new THREE.AmbientLight(0x222222, 1);
             newScene.add(ambient);
-            
+
             const lights = [];
             const colors = [0xff00ff, 0x00ffff, 0x00ff88, 0xff0088];
-            for(let i = 0; i < 12; i++) {
-                const p = new THREE.PointLight(colors[i % 4], 80, 250);
+            for(let i = 0; i < 8; i++) {
+                const p = new THREE.PointLight(colors[i % 4], 150, 400);
                 newScene.add(p);
                 lights.push(p);
             }
 
-            // Background Glowing Tunnel (Reference from portal-logic.js)
-            const tunnelGeo = new THREE.CylinderGeometry(40, 40, 1000, 32, 10, true);
-            const tunnelMat = new THREE.MeshBasicMaterial({
-                color: 0x001133,
-                side: THREE.BackSide,
-                transparent: true,
-                opacity: 0.2,
-                wireframe: true
-            });
-            const backTunnel = new THREE.Mesh(tunnelGeo, tunnelMat);
-            backTunnel.rotation.x = Math.PI / 2;
-            newScene.add(backTunnel);
+            // Procedural Tunnel Segments (from login-tunnel.js)
+            const proceduralGroup = new THREE.Group();
+            newScene.add(proceduralGroup);
+            const segmentMats = [
+                new THREE.MeshStandardMaterial({ color: '#ff33aa', roughness: 0.1, metalness: 0.8 }),
+                new THREE.MeshStandardMaterial({ color: '#33aaff', roughness: 0.1, metalness: 0.8 }),
+                new THREE.MeshStandardMaterial({ color: '#33ffff', roughness: 0.1, metalness: 0.8 })
+            ];
+
+            const generateSegment = (z) => {
+                const group = new THREE.Group();
+                const points = 12;
+                const radius = 8;
+                for (let j = 0; j < points; j++) {
+                    const angle = (j / points) * Math.PI * 2;
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+
+                    if (Math.random() > 0.4) {
+                        const geo = Math.random() > 0.5 ? new THREE.BoxGeometry(0.2, 0.2, 4) : new THREE.CylinderGeometry(0.1, 0.1, 4, 4);
+                        const mesh = new THREE.Mesh(geo, segmentMats[Math.floor(Math.random() * 3)]);
+                        mesh.position.set(x, y, z);
+                        mesh.lookAt(0, 0, z);
+                        group.add(mesh);
+                    }
+                }
+                return group;
+            };
+
+            for (let i = 0; i < 30; i++) {
+                proceduralGroup.add(generateSegment(-i * 10));
+            }
+
+            // Waterfall Setup (to be added at 13s)
+            let waterfallMesh = null;
+            const createWaterfall = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 1024;
+                const ctx = canvas.getContext('2d');
+                const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                grad.addColorStop(0, '#0066ff');
+                grad.addColorStop(0.5, '#002288');
+                grad.addColorStop(1, '#0066ff');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < 800; i++) {
+                    ctx.fillStyle = `rgba(150, 200, 255, ${Math.random() * 0.25})`;
+                    ctx.beginPath();
+                    ctx.ellipse(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 2 + 1, Math.random() * 40 + 10, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                const tex = new THREE.CanvasTexture(canvas);
+                tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+                const geom = new THREE.CylinderGeometry(40, 40, 1000, 32, 1, true);
+                const mat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, transparent: true, opacity: 0, blending: THREE.AdditiveBlending });
+                const mesh = new THREE.Mesh(geom, mat);
+                mesh.rotation.x = Math.PI / 2;
+                return mesh;
+            };
 
             Promise.all([
-                loader.loadAsync('../models/Framework.glb'),
                 loader.loadAsync('../models/PloyFramework.glb')
-            ]).then(([glb1, glb2]) => {
-                const group = new THREE.Group();
-                newScene.add(group);
-                
+            ]).then(([glb1]) => {
+                const modelGroup = new THREE.Group();
+                newScene.add(modelGroup);
+
                 const models = [];
-                const layers = 8;
-                const perLayer = 30;
-                
-                // Track points for mesh lines
-                const layerPoints = [];
+                const rings = 20;
+                const perRing = 8;
+                const baseRadius = 25;
 
-                for (let layer = 0; layer < layers; layer++) {
-                    const points = [];
-                    for (let i = 0; i < perLayer; i++) {
-                        const isFramework = (i + layer) % 2 === 0;
-                        const model = (isFramework ? glb1 : glb2).scene.clone();
-                        
-                        // Radial spiral placement - tightly woven
-                        const angle = (i / perLayer) * Math.PI * 2 + (layer * 0.4);
-                        const radius = 18 + layer * 8 + Math.sin(i * 0.5) * 3;
-                        const z = -layer * 120 - (i * 4);
-                        
-                        const pos = new THREE.Vector3(Math.cos(angle) * radius, Math.sin(angle) * radius, z);
-                        model.position.copy(pos);
-                        points.push(pos.clone());
+                for (let r = 0; r < rings; r++) {
+                    for (let i = 0; i < perRing; i++) {
+                        const model = glb1.scene.clone();
+                        const angle = (i / perRing) * Math.PI * 2 + (r * 0.3);
+                        const z = r * 50;
+                        model.position.set(Math.cos(angle) * baseRadius, Math.sin(angle) * baseRadius, z);
+                        model.lookAt(0, 0, z);
+                        model.scale.set(10, 10, 10);
 
-                        model.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-                        
-                        const scale = 4 + layer * 1.5 + Math.random() * 2;
-                        model.scale.set(scale, scale, scale);
-                        
                         model.traverse(node => {
                             if (node.isMesh) {
                                 node.material = new THREE.MeshStandardMaterial({
-                                    color: 0x111111,
-                                    emissive: colors[(i + layer) % 4],
-                                    emissiveIntensity: 3.5,
-                                    roughness: 0.05,
-                                    metalness: 1.0,
-                                    transparent: true,
-                                    opacity: 0.9
+                                    color: 0xffffff,
+                                    emissive: colors[(i + r) % 4],
+                                    emissiveIntensity: 13, // No glow
+                                    roughness: 0.2,
+                                    metalness: 0.9
                                 });
                             }
                         });
-
-                        group.add(model);
-                        models.push({
-                            mesh: model,
-                            initialPos: pos.clone(),
-                            layer: layer,
-                            rotSpeed: {
-                                x: (Math.random() - 0.5) * 0.04,
-                                y: (Math.random() - 0.5) * 0.04,
-                                z: (Math.random() - 0.5) * 0.04
-                            }
-                        });
+                        modelGroup.add(model);
+                        models.push({ mesh: model, angle, z, baseRadius });
                     }
-                    layerPoints.push(points);
                 }
 
-                // Create Mesh Lines (connecting nodes)
-                const lineMat = new THREE.LineBasicMaterial({ 
-                    color: 0x00ffff, 
-                    transparent: true, 
-                    opacity: 0.2,
-                    blending: THREE.AdditiveBlending 
-                });
-                
-                layerPoints.forEach((points, l) => {
-                    const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
-                    const line = new THREE.Line(lineGeo, lineMat.clone());
-                    group.add(line);
-                    
-                    // Cross-layer connections
-                    if (l > 0) {
-                        const crossPoints = [];
-                        for(let i = 0; i < perLayer; i++) {
-                            crossPoints.push(points[i], layerPoints[l-1][i]);
-                        }
-                        const crossGeo = new THREE.BufferGeometry().setFromPoints(crossPoints);
-                        const crossLines = new THREE.LineSegments(crossGeo, lineMat.clone());
-                        group.add(crossLines);
-                    }
-                });
-                
-                // Final Entrance Sequence
                 tunnel.scene = newScene;
-                tunnel.camera.position.set(0, 0, 100);
-                tunnel.camera.fov = 80;
+                tunnel.camera.position.set(0, 0, 50);
+                tunnel.camera.fov = 75;
                 tunnel.camera.updateProjectionMatrix();
-                
+
                 let portalTime = 0;
                 const startTime = Date.now();
-                let cameraZ = 100;
-                
-                const animatePortal = () => {
-                    const now = Date.now();
-                    portalTime = (now - startTime) / 1000;
-                    
-                    // Smooth rotation of the entire structure
-                    group.rotation.z += 0.0015;
-                    backTunnel.rotation.y += 0.002;
-                    
-                    // Individual model movement and rotation
-                    models.forEach((m) => {
-                        m.mesh.rotation.x += m.rotSpeed.x;
-                        m.mesh.rotation.y += m.rotSpeed.y;
-                        m.mesh.rotation.z += m.rotSpeed.z;
-                        
-                        // Breathing effect on scale
-                        const s = 1 + Math.sin(portalTime * 0.6 + m.layer) * 0.08;
-                        m.mesh.scale.set(m.mesh.scale.x * s, m.mesh.scale.y * s, m.mesh.scale.z * s);
+                let cameraZ = 0;
+                let waterfallAdded = false;
+
+                const animate = () => {
+                    portalTime = (Date.now() - startTime) / 1000;
+                    const expansion = 1 + Math.min(1, portalTime / 13) * 3;
+
+                    cameraZ+= (1.5 + (portalTime / 40) * 5);
+                    tunnel.camera.position.z = cameraZ;
+
+                    // Procedural group follows camera
+                    proceduralGroup.position.z = cameraZ;
+
+                    models.forEach(m => {
+                        const r = m.baseRadius * expansion;
+                        m.mesh.position.x = Math.cos(m.angle + portalTime * 0.1) * r;
+                        m.mesh.position.y = Math.sin(m.angle + portalTime * 0.1) * r;
+                        m.mesh.rotation.z += 0.01;
                     });
 
-                    // Camera movement - gradual acceleration
-                    const speed = portalTime < 13 ? 1.0 : 1.0 + (portalTime - 13) * 0.3;
-                    cameraZ -= speed;
-                    tunnel.camera.position.z = cameraZ;
-                    backTunnel.position.z = cameraZ - 200;
-                    
-                    // Lights orbit camera with complexity
-                    lights.forEach((l, li) => {
-                        const lAngle = portalTime * 1.2 + li * (Math.PI / 6);
-                        const lRadius = 30 + Math.sin(portalTime * 0.8 + li) * 15;
-                        l.position.set(
-                            Math.cos(lAngle) * lRadius,
-                            Math.sin(lAngle) * lRadius,
-                            cameraZ - 40
-                        );
-                        l.intensity = 80 + Math.sin(portalTime * 2.5 + li) * 40;
+                    lights.forEach((l, i) => {
+                        const angle = portalTime * 0.8 + i * Math.PI / 4;
+                        l.position.set(Math.cos(angle) * 30 * expansion, Math.sin(angle) * 30 * expansion, cameraZ - 50);
                     });
-                    
-                    // 13s Expansion Event - Dramatic change
-                    if (portalTime >= 13 && portalTime < 13.2) {
-                        gsap.to(group.scale, { x: 4.5, y: 4.5, duration: 5, ease: 'expo.out' });
-                        gsap.to(tunnel.camera, { fov: 155, duration: 5, onUpdate: () => tunnel.camera.updateProjectionMatrix() });
-                        gsap.to(tunnel.bloomPass, { strength: 20, radius: 2.5, duration: 5 });
-                        gsap.to(lineMat, { opacity: 0.5, duration: 2 });
+
+                    if (portalTime >= 13 && !waterfallAdded) {
+                        waterfallMesh = createWaterfall();
+                        newScene.add(waterfallMesh);
+                        gsap.to(waterfallMesh.material, { opacity: 0.8, duration: 3 });
+                        gsap.to(tunnel.bloomPass, { strength: 0.6, duration: 4 });
+                        waterfallAdded = true;
                     }
-                    
-                    // Final 3 seconds White Out (37s - 40s)
-                    if (portalTime >= 35) {
-                        const whiteVal = Math.min(1, (portalTime - 35) / 3);
+
+                    if (waterfallMesh) {
+                        // waterfallMesh.position.z = cameraZ - 200;
+                        waterfallMesh.material.map.offset.y -= 0.01;
+                    }
+
+                    // 7. Final 3 seconds White Out (37s - 40s)
+                    if (portalTime >= 37) {
+                        const whiteVal = Math.min(1, (portalTime - 37) / 3);
                         if (!tunnel.whiteOverlay) {
                             tunnel.whiteOverlay = document.createElement('div');
                             tunnel.whiteOverlay.style.position = 'fixed';
@@ -585,23 +538,23 @@ import { Text } from 'troika-three-text';
                             tunnel.whiteOverlay.style.width = '100%';
                             tunnel.whiteOverlay.style.height = '100%';
                             tunnel.whiteOverlay.style.background = 'white';
-                            tunnel.whiteOverlay.style.zIndex = '1000';
+                            tunnel.whiteOverlay.style.zIndex = '3000';
                             tunnel.whiteOverlay.style.opacity = '0';
                             document.body.appendChild(tunnel.whiteOverlay);
                         }
                         tunnel.whiteOverlay.style.opacity = whiteVal;
-                        
+
                         if (portalTime >= 40) {
                             window.location.href = '../islands/index.html';
                             return;
                         }
                     }
-                    
+
                     tunnel.composer.render();
-                    requestAnimationFrame(animatePortal);
+                    requestAnimationFrame(animate);
                 };
-                
-                animatePortal();
+
+                animate();
             });
         });
     }
