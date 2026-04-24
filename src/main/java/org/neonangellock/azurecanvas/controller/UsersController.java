@@ -2,12 +2,15 @@ package org.neonangellock.azurecanvas.controller;
 
 import jakarta.servlet.http.Cookie;
 import org.neonangellock.azurecanvas.model.User;
+import org.neonangellock.azurecanvas.model.UserFollower;
 import org.neonangellock.azurecanvas.service.UserService;
+import org.neonangellock.azurecanvas.service.impl.UserFollowServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
 import java.util.*;
 
 @RestController
@@ -17,6 +20,9 @@ public class UsersController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserFollowServiceImpl followerService;
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@CookieValue(name = "user_id", required = false) UUID userId) {
@@ -35,19 +41,7 @@ public class UsersController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("id", user.getUserId());
-        userData.put("username", user.getUsername());
-        userData.put("email", user.getEmail());
-        userData.put("avatar", user.getAvatarUrl());
-        userData.put("role", user.getRole().name());
-        userData.put("isRobot", user.isRobot());
-        userData.put("createdAt", user.getJoinedAt());
-        userData.put("postsCount", 0);
-        userData.put("followersCount", 0);
-        userData.put("followingCount", 0);
-
-        return ResponseEntity.ok(userData);
+        return ResponseEntity.ok(user);
     }
 
     @PutMapping("/me")
@@ -105,7 +99,7 @@ public class UsersController {
 
     @GetMapping("/me/posts")
     public ResponseEntity<?> getCurrentUserPosts(
-            @CookieValue(name = "user_id", required = false) Integer userId,
+            @CookieValue(name = "user_id", required = false) UUID userId,
             @RequestParam(name = "type", required = false, defaultValue = "forum") String type,
             @RequestParam(name = "page", required = false, defaultValue = "1") int page,
             @RequestParam(name = "limit", required = false, defaultValue = "10") int limit) {
@@ -155,18 +149,33 @@ public class UsersController {
             return ResponseEntity.notFound().build();
         }
 
+        UserFollower follower = new UserFollower();
+        follower.setFollowedAt(OffsetDateTime.now());
+        follower.setFollower(userService.findById(currentUserId));
+        follower.setFollowing(userService.findById(userId));
+
+        followerService.followUser(follower);
+
         return ResponseEntity.ok(Map.of("success", true,"message", "成功关注用户"));
     }
 
     @DeleteMapping("/{userId}/follow")
     public ResponseEntity<?> unfollowUser(
-            @CookieValue(name = "user_id", required = false) Integer currentUserId,
-            @PathVariable Integer userId) {
+            @CookieValue(name = "user_id", required = false) UUID currentUserId,
+            @PathVariable UUID userId) {
         if (currentUserId == null) {
             Map<String, Object> response = new HashMap<>();
             response.put("error", "NOT_LOGGED_IN");
             response.put("redirect", "../login/index.html?redirect=/user/user.html");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+        if (followerService.checkIsFollowed(currentUserId, userId)){
+            return ResponseEntity.badRequest().body(Map.of("success", false ,"message", "Unable to unfollow the user."));
+        }
+        try {
+            followerService.unfollowUser(followerService.findById(currentUserId, userId).get(0));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(Map.of("success", false ,"message", e.getMessage()));
         }
 
         return ResponseEntity.ok(Map.of("success", true ,"message", "成功取消关注用户"));

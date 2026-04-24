@@ -56,13 +56,13 @@ public class AuthController {
         User registeredUser = userService.register(user, password);
 
         // 返回用户信息
-        Map<String, Object> response = new HashMap<>();
-        response.put("id", registeredUser.getUserId());
-        response.put("username", registeredUser.getUsername());
-        response.put("email", registeredUser.getEmail());
-        response.put("role", registeredUser.getRole());
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("id", registeredUser.getUserId());
+//        response.put("username", registeredUser.getUsername());
+//        response.put("email", registeredUser.getEmail());
+//        response.put("role", registeredUser.getRole());
 
-        return ResponseEntity.ok(Map.of("success",true,"message", "Register Successfully!","user",response));
+        return ResponseEntity.ok(Map.of("success",true,"message", "Register Successfully!","user", registeredUser));
     }
 
     @PostMapping("/login")

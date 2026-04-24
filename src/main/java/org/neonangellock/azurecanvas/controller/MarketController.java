@@ -65,8 +65,8 @@ public class MarketController {
     }
 
     @PostMapping("/items")
-    public ResponseEntity<?> createItem(@RequestBody Map<String, Object> request) {
-        User user = getCurrentUser();
+    public ResponseEntity<?> createItem(@RequestBody Map<String, Object> request, @CookieValue(name = "user_id", required = false) UUID userId) {
+        User user = this.userService.findById(userId);
         Item item;
         if (user != null) {
             item = new Item();

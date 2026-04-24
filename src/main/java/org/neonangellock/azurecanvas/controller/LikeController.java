@@ -2,10 +2,14 @@ package org.neonangellock.azurecanvas.controller;
 
 import org.neonangellock.azurecanvas.model.Like;
 import org.neonangellock.azurecanvas.model.User;
+import org.neonangellock.azurecanvas.responses.ErrorResponse;
+import org.neonangellock.azurecanvas.responses.StatusResponse;
 import org.neonangellock.azurecanvas.service.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/likes")
@@ -20,13 +24,13 @@ public class LikeController {
             Like.TargetType targetType = Like.TargetType.valueOf(request.getTargetType());
             if (likeService.isLiked(user, request.getTargetId(), targetType)) {
                 likeService.unlike(user, request.getTargetId(), targetType);
-                return ResponseEntity.ok("取消点赞成功");
+                return ResponseEntity.ok(new StatusResponse<>(true, "取消点赞成功"));
             } else {
                 likeService.like(user, request.getTargetId(), targetType);
-                return ResponseEntity.ok("点赞成功");
+                return ResponseEntity.ok(new StatusResponse<>(true, "点赞成功"));
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("操作失败：" + e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorResponse("操作失败：" + e.getMessage(), ""));
         }
     }
 
@@ -37,7 +41,7 @@ public class LikeController {
             boolean isLiked = likeService.isLiked(user, targetId, type);
             return ResponseEntity.ok(isLiked);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("操作失败：" + e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorResponse("操作失败：" + e.getMessage(), ""));
         }
     }
 
