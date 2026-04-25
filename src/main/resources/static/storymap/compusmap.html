@@ -462,6 +462,10 @@
             vertical-align: middle;
         }
 
+        .bar_active {
+
+        }
+
         /* 加载更多提示 */
         .loading-trigger {
             text-align: center;
@@ -486,6 +490,51 @@
                 max-height: 80vh;
             }
         }
+
+        .search-container {
+            position: relative;
+            margin-left: 20px;
+        }
+
+        .search-input {
+            width: 0;
+            padding: 0;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: width 0.5s ease, padding 0.3s ease;
+            outline: none;
+        }
+
+        /*.search-container:hover .search-input {*/
+        /*    width: 200px;*/
+        /*    padding: 8px 16px;*/
+        /*}*/
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-button {
+            position: absolute;
+            right: 0;
+            top: 0;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 8px 10px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .home-link {
+            transition: margin-right 0.7s ease;
+        }
+
+        .search-container:hover~.home-link {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
@@ -499,8 +548,11 @@
             </h1>
         </div>
         <div class="nav-links">
-            <a href="#"><i class="fas fa-home"></i> 首页</a>
-            <a href="#"><i class="fas fa-compass"></i> 探索</a>
+            <a href="../index.html" class="go_back"><i class="fas fa-home"></i> 首页</a>
+            <button class="search-container filter-btn">
+                <input type="text" class="search-input" id="search-input" placeholder="搜索校园故事...">
+                <i class="fas fa-compass"></i> 探索
+            </button>
             <a href="#" class="btn-login"><i class="fas fa-user"></i> 登录</a>
         </div>
     </div>
@@ -687,6 +739,13 @@
         
         // 保存原始模拟数据副本
         originalStoriesData = [...MOCK_STORIES];
+
+        const search_container = document.querySelector('.search-container');
+
+        search_container.addEventListener('click', () => {
+            search_container.style.width = 600;
+            search_container.style.padding = '23px 33px';
+        });
         
         // ==================== API 调用函数（携带 Cookie） ====================
         async function fetchStoriesFromAPI(page = 1, limit = 10) {

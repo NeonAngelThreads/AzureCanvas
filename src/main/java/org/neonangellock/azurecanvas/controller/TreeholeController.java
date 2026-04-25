@@ -2,12 +2,18 @@ package org.neonangellock.azurecanvas.controller;
 
 import org.neonangellock.azurecanvas.model.TreeholeComment;
 import org.neonangellock.azurecanvas.model.TreeholePost;
+import org.neonangellock.azurecanvas.model.es.EsTreeHole;
+import org.neonangellock.azurecanvas.responses.TreeholeResponse;
+import org.neonangellock.azurecanvas.service.EsTreeHoleService;
 import org.neonangellock.azurecanvas.service.TreeholeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/treehole")
@@ -15,6 +21,10 @@ public class TreeholeController {
 
     @Autowired
     private TreeholeService treeholeService;
+
+    @Autowired
+    private EsTreeHoleService esTreeHoleService;
+
 
     @GetMapping("/posts")
     public ResponseEntity<List<TreeholePost>> getAllPosts() {
@@ -80,5 +90,83 @@ public class TreeholeController {
     public ResponseEntity<Void> deleteComment(@PathVariable Integer id) {
         treeholeService.deleteCommentById(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/search", produces = "application/json; charset=utf-8")
+    public ResponseEntity<List<TreeholeResponse>> searchTreeholes(
+            @RequestParam String keyword,
+            @RequestParam(required = false, defaultValue = "all") String category) {
+
+        // 调用ES服务进行搜索
+        SearchHits<EsTreeHole> searchHits = esTreeHoleService.searchTreeHole(keyword, 0, 100);
+
+        // 转换为前端需要的格式
+        List<TreeholeResponse> responseList = new ArrayList<>();
+
+        // 检查searchHits是否为null，以及是否有搜索结果
+        if (searchHits != null && searchHits.hasSearchHits()) {
+            responseList = searchHits.getSearchHits().stream()
+                    .map(searchHit -> {
+                        EsTreeHole treeHole = searchHit.getContent();
+                        TreeholeResponse response = new TreeholeResponse();
+                        response.setId(treeHole.getId());
+                        response.setAuthor(treeHole.getBoardName() != null && !treeHole.getBoardName().isEmpty()
+                                ? treeHole.getBoardName()
+                                : "匿名用户");
+                        response.setAuthorId(treeHole.getId());
+                        response.setAvatarLetter(treeHole.getBoardName() != null && !treeHole.getBoardName().isEmpty()
+                                ? treeHole.getBoardName().substring(0, 1)
+                                : "匿");
+                        response.setTimestamp(System.currentTimeMillis());
+
+                        // 处理高亮信息
+                        String content = treeHole.getContent() != null ? treeHole.getContent()
+                                : (treeHole.getTitle() != null ? treeHole.getTitle() : "");
+
+                        // 检查是否有高亮信息
+                        if (searchHit.getHighlightFields() != null && !searchHit.getHighlightFields().isEmpty()) {
+                            // 优先使用高亮的内容
+                            if (searchHit.getHighlightFields().containsKey("content")) {
+                                List<String> highlightContent = searchHit.getHighlightFields().get("content");
+                                if (highlightContent != null && !highlightContent.isEmpty()) {
+                                    content = String.join(" ", highlightContent);
+                                }
+                            } else if (searchHit.getHighlightFields().containsKey("title")) {
+                                List<String> highlightTitle = searchHit.getHighlightFields().get("title");
+                                if (highlightTitle != null && !highlightTitle.isEmpty()) {
+                                    content = String.join(" ", highlightTitle);
+                                }
+                            }
+                        }
+
+                        response.setContent(content);
+                        response.setCategory(category);
+                        response.setImages(List.of());
+                        response.setLikes(0);
+                        response.setLiked(false);
+                        response.setCollected(false);
+                        response.setComments(List.of());
+                        return response;
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        return ResponseEntity.ok(responseList);
+    }
+
+    /**
+     * 更新树洞数据
+     *
+     * @return 更新结果
+     */
+    @GetMapping("/update")
+    public ResponseEntity<String> updateTreeholes() {
+        try {
+            // 调用ES服务同步数据
+            esTreeHoleService.syncTreeHoleFromApi();
+            return ResponseEntity.ok("数据更新成功");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("数据更新失败: " + e.getMessage());
+        }
     }
 }

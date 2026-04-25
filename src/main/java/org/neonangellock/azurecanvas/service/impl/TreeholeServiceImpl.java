@@ -5,12 +5,20 @@ import jakarta.persistence.Query;
 import org.neonangellock.azurecanvas.model.RobotConfig;
 import org.neonangellock.azurecanvas.model.TreeholeComment;
 import org.neonangellock.azurecanvas.model.TreeholePost;
+import org.neonangellock.azurecanvas.model.es.EsTreeHole;
+import org.neonangellock.azurecanvas.responses.TreeholeResponse;
 import org.neonangellock.azurecanvas.service.AbstractQueryService;
 import org.neonangellock.azurecanvas.service.TreeholeService;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TreeholeServiceImpl extends AbstractQueryService implements TreeholeService {
@@ -164,4 +172,5 @@ public class TreeholeServiceImpl extends AbstractQueryService implements Treehol
         
         return comment;
     }
+
 }

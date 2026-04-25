@@ -1,208 +1,239 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>树洞 · 校园</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="../css/treehole/app.treehole.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AZURECANVAS-树洞</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<div class="app">
-    <header class="header">
-        <div class="logo" id="logoHome">🌳 树洞</div>
-        <div class="header-center">
-            <div class="search-wrapper">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="搜索内容...">
+  <!-- ===== 进入动画 ===== -->
+  <div id="splashScreen" class="splash-screen">
+    <canvas id="galaxyCanvas"></canvas>
+    <div class="splash-content">
+      <div class="splash-title">MUST 树洞</div>
+      <div class="splash-sub">AzureCanvas</div>
+      <div class="splash-dots"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
+  <!-- ===== 欢迎弹窗 ===== -->
+  <div id="welcomeModal" class="modal-overlay">
+    <div class="welcome-card">
+      <div class="welcome-tree">🌳</div>
+      <h2 class="welcome-title">欢迎回到 MUST 树洞</h2>
+      <p class="welcome-sub">在这里，你可以匿名分享一切心声</p>
+      <button class="btn btn-primary welcome-btn" id="welcomeCloseBtn">进入树洞</button>
+    </div>
+  </div>
+
+  <!-- ===== 导航栏 ===== -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <i class="fas fa-tree"></i> Azurecanvas-树洞
+      <span class="badge">MUST</span>
+    </div>
+
+    <!-- 搜索栏（居中） -->
+    <div class="nav-search-center">
+      <div class="nav-search">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="searchInput" placeholder="搜索帖子内容或作者…" autocomplete="off">
+        <button class="search-button" id="searchButton">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <!-- 发布按钮 → 跳转发布页 -->
+      <button class="btn btn-primary" id="newPostBtn" onclick="window.location.href='publish.html'">
+        <i class="fas fa-plus"></i> 发布
+      </button>
+
+      <!-- 右上角用户头像 -->
+      <div class="user-badge-wrap">
+        <button class="user-avatar-btn" id="userAvatarBtn" title="我的设置">我</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== 主布局 ===== -->
+  <div class="app-layout">
+
+    <!-- 左侧分类栏 -->
+    <aside class="left-sidebar">
+      <!-- 内容分类 -->
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">分类</div>
+        <div class="sidebar-item active" data-category="all">
+          <i class="fas fa-home"></i> 全部
+        </div>
+        <div class="sidebar-item" data-category="study">
+          <i class="fas fa-book"></i> 学习
+        </div>
+        <div class="sidebar-item" data-category="life">
+          <i class="fas fa-coffee"></i> 生活
+        </div>
+        <div class="sidebar-item" data-category="emotion">
+          <i class="fas fa-heart"></i> 情感
+        </div>
+        <div class="sidebar-item" data-category="question">
+          <i class="fas fa-question-circle"></i> 求助
+        </div>
+        <div class="sidebar-item" data-category="share">
+          <i class="fas fa-share-alt"></i> 分享
+        </div>
+      </div>
+
+      <!-- 消息通知 -->
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">消息</div>
+        <div class="sidebar-item" id="notifyRepliesBtn">
+          <i class="fas fa-comment-dots"></i> 评论回复
+          <span class="sidebar-badge red-badge" id="replyBadge" style="display:none">0</span>
+        </div>
+        <div class="sidebar-item" id="notifyMsgBtn">
+          <i class="fas fa-envelope"></i> 私信消息
+          <span class="sidebar-badge red-badge" id="msgBadge" style="display:none">0</span>
+        </div>
+        <div class="sidebar-item" id="myFollowingBtn">
+          <i class="fas fa-user-check"></i> 我的关注
+        </div>
+        <div class="sidebar-item" id="myFavoritesBtn">
+          <i class="fas fa-bookmark"></i> 我的收藏
+          <span class="sidebar-badge red-badge" id="collectBadge" style="display:none">0</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+
+      <!-- 搜索结果提示条 -->
+      <div class="search-results-bar" id="searchResultsBar"></div>
+
+      <!-- ===== 主页视图 ===== -->
+      <div id="homeView">
+        <!-- GitHub 风格 home 输入栏 -->
+        <div class="home-input-bar" id="homeInputBar" onclick="window.location.href='publish.html'"
+          style="cursor:pointer">
+          <div class="avatar-sm"><i class="fas fa-user"></i></div>
+          <span class="home-input-placeholder">有什么想说的？匿名分享…</span>
+          <button class="btn btn-sm agent-btn" onclick="event.stopPropagation();window.location.href='agent.html'">
+            <i class="fas fa-robot"></i> Agent
+          </button>
+          <button class="btn btn-sm" onclick="event.stopPropagation();window.location.href='publish.html'">发布</button>
+        </div>
+
+        <div class="feed-header">
+          <i class="fas fa-circle" style="font-size:0.45rem; color:#aaa; margin-right:4px;"></i>
+          实时涌动
+        </div>
+
+        <div id="postsFeedContainer"></div>
+        <div id="emptyFeedMsg" class="empty-tip" style="display:none">
+          <i class="far fa-comment-dots" style="font-size:2rem; display:block; margin-bottom:8px;"></i>
+          还没有树洞，发布第一条吧
+        </div>
+      </div>
+
+      <!-- ===== 帖子详情视图 ===== -->
+      <div id="detailView" class="detail-view">
+        <div class="back-btn" id="backBtn">
+          <i class="fas fa-arrow-left"></i> 返回
+        </div>
+        <div class="detail-card">
+          <!-- 帖子主体（作者、内容、图片） -->
+          <div class="detail-post-body" id="detailPostBody"></div>
+          <!-- 点赞/收藏操作栏 -->
+          <div class="detail-actions" id="detailActions"></div>
+          <!-- 评论区 -->
+          <div class="comment-section">
+            <div class="comment-section-title" id="commentCount">评论</div>
+            <div class="comment-input-row">
+              <!-- 回复提示标签 -->
+              <span class="reply-hint" id="replyHint" style="display:none"></span>
+              <textarea class="comment-input" id="commentInput" placeholder="写下你的评论… (Enter 发送，Esc 取消回复)"
+                rows="1"></textarea>
+              <button class="btn btn-primary btn-sm" id="submitCommentBtn">发送</button>
             </div>
+            <div id="commentsList"></div>
+          </div>
         </div>
-        <div class="header-actions">
-            <button class="btn-black" id="newPostBtn">
-                <i class="far fa-plus-square"></i> 发布
-            </button>
-        </div>
-    </header>
+      </div>
 
-    <main id="app-content">
-        <div id="homeView">
-            <div class="main-grid">
-                <div class="feed-column">
-                    <div class="section-title"><i class="fas fa-clock"></i> 实时涌动</div>
-                    <div id="postsFeedContainer">
-                        </div>
-                </div>
-
-                <aside class="sidebar">
-                    <div class="update-card">
-                        <div class="update-title">
-                            <i class="fas fa-code-branch"></i> 最新动态 · 更新日志
-                        </div>
-                        <div class="changelog-list">
-                            <div class="changelog-item">
-                                <div class="changelog-meta">3 weeks ago · Release 1.4.2</div>
-                                <div class="changelog-title">数据库更新 & Bug修复 <span class="tag">修复</span></div>
-                                <div style="font-size:0.85rem; color:#444;">修复 Android Termux 运行问题 #10，终端阅读器初始化。</div>
-                            </div>
-                            <div class="changelog-item">
-                                <div class="changelog-meta">13 hours ago</div>
-                                <div class="changelog-title">新增「低质量评论隐藏」选项</div>
-                            </div>
-                            <div class="changelog-item">
-                                <div class="changelog-meta">3 weeks ago · DolphinBot</div>
-                                <div class="changelog-title">仓库成员角色标签现已上线</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="update-card">
-                        <div class="update-title">
-                            <i class="far fa-star"></i> 热门收藏
-                        </div>
-                        <div style="color:#333;">
-                            <p style="margin-bottom:12px;">📌 期末复习资料共享</p>
-                            <p style="margin-bottom:12px;">📌 图书馆占座观察</p>
-                            <p>📌 今天吃什么 (食堂版)</p>
-                        </div>
-                    </div>
-                    <div style="font-size:0.8rem; color:#666; padding:8px;"># 黑白 · 简言</div>
-                </aside>
-            </div>
+      <!-- ===== 私信视图 ===== -->
+      <div id="messageView" class="message-view">
+        <!-- 私信顶栏 -->
+        <div class="msg-header">
+          <button class="back-btn" id="msgBackBtn" style="margin-bottom:0">
+            <i class="fas fa-arrow-left"></i> 返回
+          </button>
+          <div class="msg-target-info">
+            <div class="msg-avatar" id="msgTargetAvatar">匿</div>
+            <span id="msgTargetName">用户</span>
+          </div>
         </div>
 
-        <div id="publishView" class="hidden">
-            <div class="publish-view">
-                <div class="publish-header">
-                    <div class="publish-tabs">
-                        <span class="tab active">发贴</span>
-                        <span class="tab">发视频</span>
-                    </div>
-                    <div class="close-publish" id="cancelPublishBtn"><i class="fas fa-times"></i></div>
-                </div>
-
-                <div class="publish-form">
-                    <div class="form-row">
-                        <span class="form-label">发布到吧</span>
-                        <select class="custom-select" id="postCategory">
-                            <option>选择吧 (必填)</option>
-                            <option value="campus">校园广场</option>
-                            <option value="trade">二手交易</option>
-                        </select>
-                    </div>
-
-                    <div class="form-row">
-                        <input type="text" id="postTitleInput" class="title-input" placeholder="请输入完整帖子标题 (5-31个字) 必填">
-                    </div>
-
-                    <div class="content-editor">
-                        <textarea id="postContentInput" class="content-textarea" placeholder="请输入正文 (建议200-2000字)"></textarea>
-                        
-                        <div class="editor-toolbar">
-                            <span><i class="far fa-smile"></i> 表情</span>
-                            <span><i class="fas fa-at"></i> 用户</span>
-                            <span><i class="fas fa-hashtag"></i> 话题</span>
-                            <span id="imageUploadTrigger"><i class="far fa-image"></i> 图片</span>
-                        </div>
-                    </div>
-
-                    <div class="publish-footer">
-                        <div class="footer-options">
-                            <div class="option-item">
-                                <span>展示范围</span>
-                                <select style="border: none; background: none; font-weight: bold; cursor: pointer;">
-                                    <option>全场景可见</option>
-                                    <option>仅关注可见</option>
-                                </select>
-                            </div>
-                            <div class="option-item">
-                                <input type="checkbox" id="aiContent"> <label for="aiContent">帖子含AI内容</label>
-                                <input type="checkbox" id="original"> <label for="original">帖子原创声明</label>
-                            </div>
-                        </div>
-                        <button class="btn-publish-final" id="finalPublishBtn">发布</button>
-                    </div>
-                </div>
-            </div>
+        <!-- 消息列表 -->
+        <div class="msg-list" id="msgList">
+          <div class="msg-empty">发送第一条消息吧 👋</div>
         </div>
+
+        <!-- 快捷回复面板（底部抽屉） -->
+        <div class="quick-reply-panel" id="quickReplyPanel"></div>
+
+        <!-- 表情包面板 -->
+        <div class="quick-reply-panel" id="msgEmojiPanel"></div>
+
+        <!-- 输入栏 -->
+        <div class="msg-input-bar">
+          <button class="tool-btn" id="msgEmojiBtn" title="表情包">
+            <i class="far fa-smile"></i>
+          </button>
+          <button class="tool-btn" id="msgQuickBtn" title="快捷回复">
+            <i class="fas fa-bolt"></i>
+          </button>
+          <textarea class="msg-input" id="msgInput" placeholder="发送消息…" rows="1"></textarea>
+          <button class="btn btn-primary btn-sm" id="msgSendBtn">发送</button>
+        </div>
+      </div>
+
     </main>
-</div>
 
-<script>
-    // 页面元素获取
-    const newPostBtn = document.getElementById('newPostBtn');
-    const cancelPublishBtn = document.getElementById('cancelPublishBtn');
-    const homeView = document.getElementById('homeView');
-    const publishView = document.getElementById('publishView');
-    const finalPublishBtn = document.getElementById('finalPublishBtn');
-    const postsFeedContainer = document.getElementById('postsFeedContainer');
-    const logoHome = document.getElementById('logoHome');
+    <!-- 右侧栏 -->
+    <aside class="right-sidebar">
+      <!-- 热搜榜 -->
+      <div class="widget">
+        <div class="widget-title hot-title"><i class="fas fa-fire" style="color:#e05c00;margin-right:5px;"></i>热搜榜</div>
+        <div id="hotSearchList"></div>
+      </div>
+      <div class="widget">
+        <div class="widget-title">更新日志</div>
+        <div class="widget-item">
+          <div class="widget-item-meta">3 weeks ago · v1.4.2</div>
+          数据库更新 &amp; Bug修复
+        </div>
+        <div class="widget-item">
+          <div class="widget-item-meta">13 hours ago</div>
+          新增「低质量评论隐藏」选项
+        </div>
+      </div>
+    </aside>
 
-    // 1. 切换显示发布界面
-    newPostBtn.addEventListener('click', () => {
-        homeView.classList.add('hidden');
-        publishView.classList.remove('hidden');
-    });
+  </div>
 
-    // 2. 取消发布，返回主页
-    cancelPublishBtn.addEventListener('click', () => {
-        homeView.classList.remove('hidden');
-        publishView.classList.add('hidden');
-    });
-
-    logoHome.addEventListener('click', () => {
-        homeView.classList.remove('hidden');
-        publishView.classList.add('hidden');
-    });
-
-    // 3. 模拟发布逻辑
-    finalPublishBtn.addEventListener('click', () => {
-        const title = document.getElementById('postTitleInput').value;
-        const content = document.getElementById('postContentInput').value;
-
-        if (title.length < 5) {
-            alert('标题字数不足！');
-            return;
-        }
-
-        // 模拟成功发布：添加到列表最前端
-        const newPost = document.createElement('div');
-        newPost.className = 'post-card';
-        newPost.innerHTML = `
-            <h3>${title}</h3>
-            <p>${content}</p>
-            <div style="font-size:0.8rem; color:#999; margin-top:10px;">刚刚发布 · 校园广场</div>
-        `;
-        
-        // 插入到内容区
-        if (postsFeedContainer.innerHTML.includes('正在加载')) {
-            postsFeedContainer.innerHTML = '';
-        }
-        postsFeedContainer.prepend(newPost);
-
-        // 重置表单并返回
-        document.getElementById('postTitleInput').value = '';
-        document.getElementById('postContentInput').value = '';
-        homeView.classList.remove('hidden');
-        publishView.classList.add('hidden');
-    });
-
-    // 初始化一些模拟数据
-    window.onload = () => {
-        postsFeedContainer.innerHTML = `
-            <div class="post-card">
-                <h3>关于图书馆二楼插座维修的通知</h3>
-                <p>今天去图书馆发现二楼西侧的插座都断电了，有同学知道什么时候能修好吗？</p>
-                <div style="font-size:0.8rem; color:#999; margin-top:10px;">2小时前 · 校园广场</div>
-            </div>
-            <div class="post-card">
-                <h3>【求助】有人捡到学生卡吗？</h3>
-                <p>在三食堂附近掉了一张学生卡，姓名：张三，联系电话138...</p>
-                <div style="font-size:0.8rem; color:#999; margin-top:10px;">5小时前 · 二手交易</div>
-            </div>
-        `;
-    };
-</script>
-
+  <!-- ===== 脚本加载（顺序：数据层→渲染层→功能模块→入口）===== -->
+  <script src="store.js"></script>
+  <script src="render.js"></script>
+  <script src="user.js"></script>
+  <script src="message.js"></script>
+  <script src="main.js"></script>
 </body>
+
 </html>

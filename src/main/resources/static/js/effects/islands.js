@@ -22,7 +22,7 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
             { 
                 name: 'IsleA', 
                 path: '../models/Islands/IsleA.glb', 
-                link: '../treehole/treehole.html',
+                link: '../treehole/index.html',
                 pos: [30, 0, 30],
                 scale: 1.3
             },
@@ -375,9 +375,11 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
         }, 40);
     }
 
+
+    // 千万不要改
     function onMouseMove(e) {
-        mouse.x = (e.clientX / window.innerWidth) * 4 - 1;
-        mouse.y = -(e.clientY / window.innerHeight) * 4 + 1;
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
     }
 
     function onMouseDown(e) {
