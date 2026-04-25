@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -83,6 +84,16 @@ public class TreeholeServiceImpl extends AbstractQueryService implements Treehol
             post.setLikeCount(post.getLikeCount() - 1);
             entityManager.merge(post);
         }
+    }
+
+    @Override
+    public List<TreeholePost> getNewest() {
+        Query query = entityManager.createQuery(
+                "SELECT p FROM TreeholePost p WHERE p.createdAt = :lastTimeLogout ORDER BY p.createdAt ASC");
+
+        query.setParameter("lastTimeLogout", OffsetDateTime.now());
+
+        return query.getResultList();
     }
 
     @Override

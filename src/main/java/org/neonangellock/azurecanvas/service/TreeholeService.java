@@ -3,6 +3,7 @@ package org.neonangellock.azurecanvas.service;
 import org.neonangellock.azurecanvas.model.TreeholeComment;
 import org.neonangellock.azurecanvas.model.TreeholePost;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 public interface TreeholeService {
@@ -13,6 +14,8 @@ public interface TreeholeService {
     void deletePostById(Integer id);
     void incrementLikeCount(Integer postId);
     void decrementLikeCount(Integer postId);
+
+    List<TreeholePost> getNewest();
     
     TreeholeComment findCommentById(Integer id);
     List<TreeholeComment> findCommentsByPostId(Integer postId);

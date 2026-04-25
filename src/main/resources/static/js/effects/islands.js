@@ -29,7 +29,7 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
             {
                 name: 'IsleC',
                 path: '../models/Islands/IsleC.glb',
-                link: '../storymap/compusmap.html',
+                link: '../storymap/index.html',
                 pos: [35, -10, -35],
 
                 scale: 0.75

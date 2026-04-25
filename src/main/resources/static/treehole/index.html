@@ -40,6 +40,7 @@
 
     <!-- 搜索栏（居中） -->
     <div class="nav-search-center">
+      <theme-button value="dark" id="btn" size="3"></theme-button>
       <div class="nav-search">
         <i class="fas fa-search search-icon"></i>
         <input type="text" id="searchInput" placeholder="搜索帖子内容或作者…" autocomplete="off">
@@ -54,7 +55,6 @@
       <button class="btn btn-primary" id="newPostBtn" onclick="window.location.href='publish.html'">
         <i class="fas fa-plus"></i> 发布
       </button>
-
       <!-- 右上角用户头像 -->
       <div class="user-badge-wrap">
         <button class="user-avatar-btn" id="userAvatarBtn" title="我的设置">我</button>
@@ -223,6 +223,8 @@
           <div class="widget-item-meta">13 hours ago</div>
           新增「低质量评论隐藏」选项
         </div>
+
+
       </div>
     </aside>
 
@@ -234,6 +236,19 @@
   <script src="user.js"></script>
   <script src="message.js"></script>
   <script src="main.js"></script>
+  <script src="daynight.changer.js"></script>
+
+<!--  <script>-->
+<!--    document.body.style.backgroundColor = "#424242";-->
+<!--    btn.addEventListener("change", e => {-->
+<!--      if (e.detail === 'dark') {-->
+<!--        document.body.style.backgroundColor = "#424242";-->
+<!--      }-->
+<!--      else {-->
+<!--        document.body.style.backgroundColor = "aliceblue";-->
+<!--      }-->
+<!--    });-->
+<!--  </script>-->
 </body>
 
 </html>

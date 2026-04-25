@@ -1,10 +1,14 @@
 package org.neonangellock.azurecanvas.service.impl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import org.neonangellock.azurecanvas.model.Item;
 import org.neonangellock.azurecanvas.model.ItemCategory;
+import org.neonangellock.azurecanvas.model.TreeholePost;
 import org.neonangellock.azurecanvas.model.User;
 import org.neonangellock.azurecanvas.repository.ItemCategoryRepository;
 import org.neonangellock.azurecanvas.repository.ItemRepository;
+import org.neonangellock.azurecanvas.service.AbstractQueryService;
 import org.neonangellock.azurecanvas.service.IMarketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,17 +18,22 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-public class MarketServiceImpl implements IMarketService {
+public class MarketServiceImpl extends AbstractQueryService implements IMarketService {
 
     @Autowired
     private ItemRepository itemRepository;
 
     @Autowired
     private ItemCategoryRepository categoryRepository;
+
+    protected MarketServiceImpl(EntityManager entityManager) {
+        super(entityManager);
+    }
 
     @Override
     public Page<Item> findAllItems(String category, String sortBy, String order, int page, int limit, String search) {
@@ -49,6 +58,16 @@ public class MarketServiceImpl implements IMarketService {
         } else {
             return itemRepository.findAll(pageable);
         }
+    }
+
+    @Override
+    public List<Item> findNewest() {
+        Query query = entityManager.createQuery(
+                "SELECT p FROM Item p WHERE p.createdAt = :lastLogout ORDER BY p.createdAt ASC");
+
+        query.setParameter("lastLogout", OffsetDateTime.now());
+
+        return query.getResultList();
     }
 
     @Override

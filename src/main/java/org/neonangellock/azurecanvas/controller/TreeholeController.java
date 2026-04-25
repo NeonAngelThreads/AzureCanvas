@@ -1,10 +1,13 @@
 package org.neonangellock.azurecanvas.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.neonangellock.azurecanvas.model.TreeholeComment;
 import org.neonangellock.azurecanvas.model.TreeholePost;
 import org.neonangellock.azurecanvas.model.es.EsTreeHole;
 import org.neonangellock.azurecanvas.responses.TreeholeResponse;
 import org.neonangellock.azurecanvas.service.EsTreeHoleService;
+import org.neonangellock.azurecanvas.service.IMarketService;
+import org.neonangellock.azurecanvas.service.IStoryMapService;
 import org.neonangellock.azurecanvas.service.TreeholeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -13,14 +16,22 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
+@Slf4j
 @RequestMapping("/api/treehole")
 public class TreeholeController {
 
     @Autowired
     private TreeholeService treeholeService;
+
+    @Autowired
+    private IMarketService marketService;
+
+    @Autowired
+    private IStoryMapService storyMapService;
 
     @Autowired
     private EsTreeHoleService esTreeHoleService;
@@ -37,6 +48,22 @@ public class TreeholeController {
         return ResponseEntity.ok(treeholeService.findRecentPosts(limit));
     }
 
+    @GetMapping("newest")
+    public ResponseEntity<?> getNewestPosts(){
+
+        try {
+            return ResponseEntity.ok(
+                    Map.of(
+                            "items", this.marketService.findNewest(),
+                            "treehole", this.treeholeService.getNewest(),
+                            "storymap", this.storyMapService.findNewest()
+                    )
+            );
+        } catch (Exception e) {
+            log.error("error loading the newest posts {}", e.getMessage());
+        }
+        return ResponseEntity.internalServerError().build();
+    }
     @GetMapping("/posts/{id}")
     public ResponseEntity<TreeholePost> getPostById(@PathVariable Integer id) {
         TreeholePost post = treeholeService.findPostById(id);

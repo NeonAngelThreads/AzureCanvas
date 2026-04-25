@@ -101,7 +101,7 @@ public class MarketController {
         return ResponseEntity.ok(Map.of());
     }
 
-    @GetMapping("/items/favorites/")
+    @GetMapping("/items/favorites")
     public ResponseEntity<?> getFavoriteItems(@CookieValue(name = "user_id", required = false) UUID userId) {
         if(userId == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "not logged in"));

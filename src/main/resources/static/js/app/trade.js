@@ -478,7 +478,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (dropdownFav) dropdownFav.textContent = user.favorites || 0;
         } else {
             if (response.status === 401) {
-                window.location.href = '/login?redirect=/azure_trade/trade';
+                window.location.href = '/login/index.html?redirect=/azure_trade/trade';
             }
         }
     } catch (error) {

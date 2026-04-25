@@ -1,6 +1,7 @@
 package org.neonangellock.azurecanvas.service.impl;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import org.neonangellock.azurecanvas.model.User;
 import org.neonangellock.azurecanvas.model.storymap.StoryMap;
 import org.neonangellock.azurecanvas.model.storymap.StoryMapLocation;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,6 +37,15 @@ public class StoryMapServiceImpl extends AbstractQueryService implements IStoryM
     @Transactional
     public void updateLocationOfStory(StoryMap storyMap, StoryMapLocation newLocation) {
         // Implementation for updating locations
+    }
+
+    public List<StoryMap> findNewest(){
+        Query query = entityManager.createQuery(
+                "SELECT p FROM StoryMap p WHERE p.createdAt = :lastTimeLogout ORDER BY p.createdAt ASC");
+
+        query.setParameter("lastTimeLogout", OffsetDateTime.now());
+
+        return query.getResultList();
     }
 
     @Override

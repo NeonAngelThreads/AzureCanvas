@@ -1,5 +1,6 @@
 package org.neonangellock.azurecanvas.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@Slf4j
 public class IpController {
 
     @GetMapping("/api/ip-location")
@@ -27,7 +29,7 @@ public class IpController {
                 return result;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("error {}", e.getMessage());
         }
         // 失败时返回空地图，前端会提示定位失败并回退
         return new HashMap<>();

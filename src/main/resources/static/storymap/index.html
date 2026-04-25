@@ -9,6 +9,18 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <!-- 字体图标 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#7c3aed'
+                    }
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -261,6 +273,51 @@
             align-items: center;
         }
 
+        .search-container {
+            position: relative;
+            margin-left: 8px;
+        }
+
+        .search-input {
+            width: 0;
+            padding: 0;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: width 0.3s ease, padding 0.3s ease;
+            outline: none;
+        }
+
+        .search-container:hover .search-input {
+            width: 200px;
+            padding: 8px 8px;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-button {
+            position: relative;
+            right: 0;
+            top: 0;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 8px 8px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .home-link {
+            transition: margin-right 0.3s ease;
+        }
+
+        /*.search-container:hover~.home-link {*/
+        /*    margin-right: 10px;*/
+        /*}*/
+
         .modal-content {
             /* 材质改变：从 background: white 改为毛玻璃背景 */
             background: rgba(255, 255, 255, 0.92);
@@ -274,10 +331,10 @@
             padding: 25px;
             /* 最初没有 box-shadow 和 border，所以不添加 */
              /* 新增玻璃质感：阴影 + 半透明白色边框 + 内发光 */
-    box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.3), 
+    box-shadow: 0 20px 35px -10px rgba(39, 12, 65, 0.3),
                 0 0 0 1px rgba(255, 255, 255, 0.5) inset,
                 0 0 0 2px rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(0); /* 无需模糊，因为背景不透明 */
+    backdrop-filter: blur(20px); /* 无需模糊，因为背景不透明 */
         }
 
         /* 保持内部表单元素样式与最初一致（无改动） */
@@ -682,7 +739,15 @@
             </div>
             <a href="../index.html"><i class="fas fa-home"></i> 首页</a>
             <a id="exploreBtn"><i class="fas fa-compass"></i> 探索</a>
-            <a href="#" class="btn-login"><i class="fas fa-user"></i> 登录</a>
+
+            <a class="search-container">
+                <input type="text" class="search-input" id="search-input" placeholder="搜索校园故事...">
+            </a>
+            <a href="../login/index.html?redirect=../storymap/index.html" class="btn-login" id="login-btn"><i class="fas fa-user"></i> 登录</a>
+<!--            <div id="header-avatar"-->
+<!--                 class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white text-sm font-bold shadow">-->
+<!--                A-->
+<!--            </div>-->
         </div>
     </div>
 
@@ -1106,6 +1171,168 @@ const AREA_COORDS = { taipa:{lat:22.1564,lon:113.5588}, coloane:{lat:22.1200,lon
 const weatherIcon = document.getElementById('weatherIcon');
 const weatherTemp = document.getElementById('weatherTemp');
 
+        function setupSearch() {
+            const searchInput = document.getElementById('search-input');
+            // const searchButton = document.getElementById('search-button');
+
+            if (searchInput) {
+
+                // 搜索输入框回车事件
+                searchInput.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        const keyword = searchInput.value.trim();
+                        if (keyword) {
+                            searchStories(keyword);
+                        }
+                    }
+                });
+            }
+        }
+
+        // 搜索故事
+        async function searchStories(keyword) {
+            // 设置搜索状态
+            let isSearchMode = true;
+            let currentSearchKeyword = keyword;
+
+            try {
+                // 显示加载状态
+                const storiesList = document.getElementById('storiesList');
+                storiesList.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;"><i class="fas fa-spinner fa-spin"></i> 搜索中...</div>';
+
+                // 调用ES API
+                const response = await fetch(`http://localhost:8088/api/storymaps/search?keyword=${encodeURIComponent(keyword)}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API 返回错误: ${response.status}`);
+                }
+
+                const searchResults = await response.json();
+
+                if (Array.isArray(searchResults) && searchResults.length > 0) {
+                    // 转换搜索结果格式
+                    try {
+                        let formattedResults = searchResults.map(convertAPIStory).filter(Boolean);
+                        // 应用分类筛选
+                        if (currentFilter !== "all") {
+                            formattedResults = formattedResults.filter(story => story.category === currentFilter);
+                        }
+                        // 渲染搜索结果
+                        renderSearchResults(formattedResults, keyword);
+                    } catch (mapError) {
+                        console.error('处理搜索结果失败:', mapError);
+                        // 无结果
+                        storiesList.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;"><i class="fas fa-search"></i><br>未找到相关故事</div>';
+                    }
+                } else {
+                    // 无结果
+                    storiesList.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;"><i class="fas fa-search"></i><br>未找到相关故事</div>';
+                }
+            } catch (error) {
+                console.error('搜索失败:', error);
+                // 搜索失败时使用本地数据进行模糊搜索
+                let localResults = allStories.filter(story =>
+                    story.title.toLowerCase().includes(keyword.toLowerCase()) ||
+                    story.description.toLowerCase().includes(keyword.toLowerCase()) ||
+                    story.location.toLowerCase().includes(keyword.toLowerCase())
+                );
+                // 应用分类筛选
+                if (currentFilter !== "all") {
+                    localResults = localResults.filter(story => story.category === currentFilter);
+                }
+                if (localResults.length > 0) {
+                    renderSearchResults(localResults, keyword);
+                } else {
+                    const storiesList = document.getElementById('storiesList');
+                    storiesList.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;"><i class="fas fa-search"></i><br>未找到相关故事</div>';
+                }
+            }
+        }
+
+        // 渲染搜索结果
+        function renderSearchResults(results, keyword) {
+            const container = document.getElementById('storiesList');
+
+            if (results.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;"><i class="fas fa-search"></i><br>未找到相关故事</div>';
+                return;
+            }
+
+            // 按创建时间排序（最新的在前面）
+            const sorted = [...results].sort((a, b) =>
+                new Date(b.createdAt) - new Date(a.createdAt)
+            );
+
+            // 先处理高亮，再渲染
+            const html = sorted.map(story => {
+                const description = story.description || '';
+                const highlightedTitle = highlightKeyword(story.title, keyword);
+                const highlightedDescription = highlightKeyword(description.substring(0, 100), keyword);
+                const highlightedLocation = highlightKeyword(story.location || '校园', keyword);
+
+                return `
+                    <div class="story-card" onclick="showStoryDetail('${story.storyMapId}'); zoomToStory(${story.lat}, ${story.lng})"><div class="story-title">
+                            ${highlightedTitle}
+                            <span class="story-category category-${story.category}">
+                                ${story.category === 'study' ? '📚 学习' : story.category === 'life' ? '🍜 生活' : story.category === 'emotion' ? '💕 情感' : '🎉 活动'}
+                            </span>
+                        </div>
+                        <div class="story-preview">
+                            ${highlightedDescription}${description.length > 100 ? '...' : ''}
+                        </div>
+                        <div class="story-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> ${highlightedLocation}</span>
+                            <span><i class="fas fa-user"></i> ${story.author}</span>
+                            <span><i class="fas fa-calendar"></i> ${formatDate(story.createdAt)}</span>
+                        </div>
+                        <div class="story-meta" style="margin-top: 5px;">
+                            <span class="story-likes"><i class="fas fa-heart"></i> ${story.likes}</span>
+                            <span class="story-comments"><i class="fas fa-comment"></i> ${story.comments}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = html;
+        }
+
+        // 高亮关键字
+        function highlightKeyword(text, keyword) {
+            if (!keyword || !text || typeof text !== 'string') return text || '';
+            // 检查text是否已经包含后端返回的高亮标签
+            if (text.includes('<em>')) {
+                return text; // 已经包含高亮标签，直接返回
+            }
+            // 检查text是否已经包含前端高亮标签
+            if (text.includes('<span class="text-red-500 font-bold">')) {
+                return text; // 已经包含高亮标签，直接返回
+            }
+            // 将关键词分解为单个字符，分别标红
+            const chars = keyword.split('');
+            let result = text;
+            chars.forEach(function (char) {
+                if (char.trim()) {
+                    const regex = new RegExp('(' + char + ')', 'gi');
+                    result = result.replace(regex, '<span class="text-red-500 font-bold">$1</span>');
+                }
+            });
+            return result;
+        }
+
+        // 定时任务：每5分钟更新数据
+        function setupUpdateTask() {
+            setInterval(async function () {
+                console.log('定时更新数据...');
+                await refreshStories();
+            }, 5 * 60 * 1000); // 5分钟
+        }
+
 async function fetchWeather(area) {
     const c = AREA_COORDS[area];
     if(!c) return;
@@ -1152,16 +1379,60 @@ options.forEach(opt => {
     });
 });
 document.addEventListener('click', () => customSelect.classList.remove('open'));
+function load_user(){
+    const response = fetch('/api/users/me', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+    });
+
+    if (response.ok) {
+        const user = response.json();
+
+        // 保存完整用户数据到 localStorage（供 profile 等页面使用）
+        var existing = {};
+        try {
+            existing = JSON.parse(localStorage.getItem('userProfile') || '{}');
+        } catch (e) {
+        }
+        Object.keys(user).forEach(function (k) {
+            existing[k] = user[k];
+        });
+        localStorage.setItem('userProfile', JSON.stringify(existing));
+
+        return user.username || user.nickname || '用户';
+    }
+    return null;
+}
 
 // 初始加载
 fetchWeather('taipa');
 setInterval(() => fetchWeather(currentArea), 30 * 60 * 1000);
-        async function init() { initMap(); setupInfiniteScroll(); await loadMoreStories(); }
-        init();
-        const style = document.createElement('style');
-        style.textContent = `@keyframes pulse{0%{transform:scale(1);opacity:1;}100%{transform:scale(2);opacity:0;}} .custom-div-icon{background:transparent;border:none;}`;
-        document.head.appendChild(style);
-        console.log("✅ 校园故事地图已启动");
+window.addEventListener('DOMContentLoaded', () => {
+    async function init() {
+        initMap();
+        setupSearch();
+        setupInfiniteScroll();
+        await loadMoreStories();
+    }
+
+    init();
+    const userAvatar = document.getElementById('header-avatar');
+    let userName = load_user();
+    if (userName !== null) {
+        let char = userName.charAt(0).toUpperCase();
+        userAvatar.innerHTML = `<div id="header-avatar"
+                 class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white text-sm font-bold shadow">
+                ${char}
+            </div>`
+    }
+
+    const style = document.createElement('style');
+    style.textContent = `@keyframes pulse{0%{transform:scale(1);opacity:1;}100%{transform:scale(2);opacity:0;}} .custom-div-icon{background:transparent;border:none;}`;
+    document.head.appendChild(style);
+    console.log("✅ 校园故事地图已启动");
+
+});
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="../js/effects/mouse-ripple.js"></script>

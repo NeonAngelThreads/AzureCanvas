@@ -88,7 +88,7 @@ public class StoryMapController {
             return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(saved));
         }
         else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "NOT_LOGGED_IN", "redirect", "/login/index.html?redirect=/storymap/compusmap.html"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "NOT_LOGGED_IN", "redirect", "/login/index.html?redirect=/storymap/index.html"));
         }
     }
 

@@ -5,6 +5,7 @@ import org.neonangellock.azurecanvas.model.ItemCategory;
 import org.neonangellock.azurecanvas.model.User;
 import org.springframework.data.domain.Page;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,6 +14,8 @@ public interface IMarketService {
     Item findItemById(UUID itemId);
     Item saveItem(Item item);
     void deleteItem(UUID itemId);
+
+    List<Item> findNewest();
     Page<Item> findItemsBySeller(User seller, String status, int page, int limit);
     List<ItemCategory> findAllCategories();
 }
