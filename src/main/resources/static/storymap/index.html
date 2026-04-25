@@ -1059,7 +1059,32 @@
             pendingStoryCoords = null;
             document.getElementById('coordHint').innerHTML = "💡 提示：双击地图可自动获取坐标";
         }
-        async function submitStory(story) { console.log("发布故事", story); }
+        async function submitStory(story) {
+            const url = 'http://localhost:8088/api/storymaps'; // Replace with your API endpoint
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST', // HTTP method
+                    mode: "cors",
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json' // Sending JSON
+                    },
+                    body: JSON.stringify(story) // Convert JS object to JSON string
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const result = await response.json(); // Parse JSON response
+                if (!result.uuid){
+                    console.error('地图添加失败');
+                }
+            } catch (error) {
+                console.error('Error:', error.message);
+            }
+        }
         function showSuccessToast(msg) {
             const toast = document.createElement('div');
             toast.innerHTML = `<div style="position:fixed; bottom:100px; right:30px; background:rgba(0,0,0,0.8); backdrop-filter:blur(12px); color:white; padding:12px 24px; border-radius:40px; z-index:4000; animation:fadeIn 0.3s;"><i class="fas fa-check-circle" style="color:#4ade80; margin-right:8px;"></i> ${msg}</div>`;

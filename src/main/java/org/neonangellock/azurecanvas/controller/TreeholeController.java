@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
-@RequestMapping("/api/treehole")
+@RequestMapping("/api/treeholes")
 public class TreeholeController {
 
     @Autowired
@@ -48,7 +48,7 @@ public class TreeholeController {
         return ResponseEntity.ok(treeholeService.findRecentPosts(limit));
     }
 
-    @GetMapping("newest")
+    @GetMapping("/newest")
     public ResponseEntity<?> getNewestPosts(){
 
         try {

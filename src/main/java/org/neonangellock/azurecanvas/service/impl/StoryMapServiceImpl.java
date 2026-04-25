@@ -92,4 +92,10 @@ public class StoryMapServiceImpl extends AbstractQueryService implements IStoryM
     public void deleteById(UUID id) {
         repository.deleteById(id);
     }
+
+    // 搜索故事地图
+    @Override
+    public List<StoryMap> searchByKeyword(String keyword) {
+        return repository.searchByKeyword(keyword);
+    }
 }

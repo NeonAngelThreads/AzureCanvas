@@ -152,7 +152,10 @@
         var isFav = favs.some(function(f) { return f.id === pid; });
         var btn = document.getElementById('fav-btn');
         var icon = document.getElementById('fav-icon');
+
         if (isFav) {
+
+
             icon.textContent = '★';
             // 移除默认色，添加深紫色（border-purple-400，和聊一聊完全同频）
             btn.classList.remove('text-gray-400', 'border-gray-200', 'text-red-500', 'border-red-300', 'border-purple-300');

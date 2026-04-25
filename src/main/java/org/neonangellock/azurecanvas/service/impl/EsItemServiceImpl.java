@@ -90,10 +90,10 @@ public class EsItemServiceImpl implements EsItemService {
     @Autowired
     private ItemRepository itemRepository;
 
-    @Autowired
+    @Autowired(required = false)
     private EsItemRepository esItemRepository;
 
-    @Autowired
+    @Autowired(required = false)
     private ElasticsearchOperations elasticsearchOperations;
 
     private final RestTemplate restTemplate = new RestTemplate();

@@ -25,7 +25,7 @@ public class ItemFavorite {
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
     @JoinColumn(name = "userId")
-    private User liker;
+    private User user;
 
     @CreationTimestamp
     @Column(name = "likedAt", nullable = false, updatable = false)
@@ -35,11 +35,11 @@ public class ItemFavorite {
     @Getter @Setter
     public static class ItemFavoriteId implements Serializable {
         private UUID userId;
-        private UUID item;
+        private UUID itemId;
 
         public ItemFavoriteId() {}
         public ItemFavoriteId(UUID followerId, UUID followingId) {
-            this.item = followerId;
+            this.itemId = followerId;
             this.userId = followingId;
         }
 
@@ -48,12 +48,12 @@ public class ItemFavorite {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             ItemFavorite.ItemFavoriteId that = (ItemFavorite.ItemFavoriteId) o;
-            return item.equals(that.item) && userId.equals(that.userId);
+            return itemId.equals(that.itemId) && userId.equals(that.userId);
         }
 
         @Override
         public int hashCode() {
-            return 31 * userId.hashCode() + item.hashCode();
+            return 31 * userId.hashCode() + itemId.hashCode();
         }
     }
 }

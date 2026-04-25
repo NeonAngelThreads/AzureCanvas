@@ -71,7 +71,7 @@ public class EsItem {
     public boolean isUrgent() { return isUrgent; }
     public void setUrgent(boolean urgent) { isUrgent = urgent; }
     public boolean isFreeShipping() { return isFreeShipping; }
-    public void setFreeShipping(boolean freeShipping) { isFreeShipping = freeShipping; }
+
     public boolean isCanInspect() { return canInspect; }
     public void setCanInspect(boolean canInspect) { this.canInspect = canInspect; }
     public String getCreatedAt() { return createdAt; }

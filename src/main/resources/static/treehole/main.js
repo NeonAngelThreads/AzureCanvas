@@ -1,9 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const response = fetch(`/api/treeholes/posts`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
 
+  if (response.ok) {
+    for (let responseKey in response) {
+      console.log(responseKey);
+    }
+  }
   // ===== 0. 进入动画（仅首次访问显示）+ 欢迎弹窗 =====
   const splash = document.getElementById("splashScreen");
   const welcomeModal = document.getElementById("welcomeModal");
-  const isFirstVisit = !localStorage.getItem("th_visited");
+  const isFirstVisit = true;//!localStorage.getItem("th_visited");
 
   if (!isFirstVisit) {
     // 非首次：直接隐藏 splash，不播放动画

@@ -248,6 +248,7 @@ publishForm.addEventListener('submit', async function (e) {
     });
 
     var imageDataUrls = await Promise.all(imagePromises);
+    console.log(imageDataUrls)
 
     // 构建本地存储对象
     var item = {

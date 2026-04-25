@@ -14,11 +14,11 @@ import java.util.UUID;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, UUID> {
     Page<Item> findByCategory(String category, Pageable pageable);
-    
+
     @Query("SELECT i FROM Item i WHERE lower(i.title) LIKE lower(concat('%', :search, '%')) OR lower(i.description) LIKE lower(concat('%', :search, '%'))")
     Page<Item> searchItems(@Param("search") String search, Pageable pageable);
-    
+
     Page<Item> findBySeller(User seller, Pageable pageable);
-    
+
     Page<Item> findBySellerAndStatus(User seller, String status, Pageable pageable);
 }

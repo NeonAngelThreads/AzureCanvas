@@ -12,5 +12,6 @@ public interface IStoryMapService extends IContentService<StoryMap> {
     void updateLocationOfStory(StoryMap storyMap, StoryMapLocation newLocation);
     void deleteLocationFromStory(StoryMap storyMap, StoryMapLocation removal);
     List<StoryMap> findNewest();
+    List<StoryMap> searchByKeyword(String keyword);
     void addLocationFromStory(StoryMap storyMap, StoryMapLocation location);
 }
