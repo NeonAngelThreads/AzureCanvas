@@ -40,7 +40,7 @@
 
     <!-- 搜索栏（居中） -->
     <div class="nav-search-center">
-      <theme-button value="dark" id="btn" size="3"></theme-button>
+      <theme-button value="light" id="btn" size="3"></theme-button>
       <div class="nav-search">
         <i class="fas fa-search search-icon"></i>
         <input type="text" id="searchInput" placeholder="搜索帖子内容或作者…" autocomplete="off">
@@ -224,7 +224,6 @@
           新增「低质量评论隐藏」选项
         </div>
 
-
       </div>
     </aside>
 
@@ -238,17 +237,23 @@
   <script src="main.js"></script>
   <script src="daynight.changer.js"></script>
 
-<!--  <script>-->
-<!--    document.body.style.backgroundColor = "#424242";-->
-<!--    btn.addEventListener("change", e => {-->
-<!--      if (e.detail === 'dark') {-->
-<!--        document.body.style.backgroundColor = "#424242";-->
-<!--      }-->
-<!--      else {-->
-<!--        document.body.style.backgroundColor = "aliceblue";-->
-<!--      }-->
-<!--    });-->
-<!--  </script>-->
+  <script>
+    document.body.style.backgroundColor = "aliceblue";
+    btn.addEventListener("change", e => {
+      if (e.detail === 'dark') {
+        document.body.style.backgroundColor = "rgba(0,0,0,0.83)";
+        let ele = document.querySelector(".post-card");
+        ele.style.color = "aliceblue";
+        ele.style.background = "rgba(74,66,94,0.83)";
+      }
+      else {
+        let ele = document.querySelector(".post-card");
+        ele.style.background = "var(--bg)";
+        ele.style.color = "aliceblue";
+        document.body.style.backgroundColor = "aliceblue";
+      }
+    });
+  </script>
 </body>
 
 </html>

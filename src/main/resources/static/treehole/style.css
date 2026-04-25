@@ -4,12 +4,18 @@
  */
 
 /* ===== 全局重置 & 变量 ===== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
 *,
 *::before,
 *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+* {
+  font-family: 'Poppins', sans-serif;
 }
 
 :root {
@@ -29,25 +35,35 @@
   --transition: 0.18s ease;
 }
 
+body::before {
+  content: 'ssdas';
+  position: absolute;
+  inset: 0;
+  z-index: -9;
+  background-size: cover;
+  background: url("../artifacts/treehole_bg.webp") fixed center;
+}
+
 body {
   background: var(--bg-subtle);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   font-size: 17px;
   line-height: 1.7;
+  transition: all 0.5s;
 }
 
 /* ===== 导航栏 ===== */
 .navbar {
   background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  border-bottom: 1px solid rgba(208, 215, 222, 0.6);
+  backdrop-filter: blur(30px) saturate(280%);
+  -webkit-backdrop-filter: blur(28px) saturate(280%);
+  border-bottom: none;
   position: sticky;
   top: 0;
   z-index: 200;
   padding: 0 32px;
-  height: 64px;
+  height: 77px;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -89,7 +105,7 @@ body {
 .nav-search input {
   width: 100%;
   padding: 8px 60px 8px 36px;
-  border: 1px solid var(--border);
+  border: none;
   border-radius: 20px;
   background: var(--bg-subtle);
   font-size: 0.95rem;
@@ -157,7 +173,7 @@ body {
   font-weight: 500;
   cursor: pointer;
   transition: var(--transition);
-  border: 1px solid var(--border);
+  border: none;
   background: var(--bg);
   color: var(--text);
   text-decoration: none;
@@ -215,7 +231,7 @@ body {
   right: 0;
   top: 40px;
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   padding: 14px;
@@ -232,7 +248,7 @@ body {
   font-size: 0.875rem;
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-muted);
+  border-bottom: none;
 }
 
 .dropdown-field {
@@ -249,7 +265,7 @@ body {
 .dropdown-field input {
   width: 100%;
   padding: 6px 10px;
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--radius);
   font-size: 0.875rem;
   background: var(--bg-subtle);
@@ -307,7 +323,7 @@ body {
 
 .sidebar-section {
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
@@ -319,7 +335,7 @@ body {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-bottom: 1px solid var(--border-muted);
+  border-bottom: none;
 }
 
 .sidebar-item {
@@ -331,7 +347,7 @@ body {
   cursor: pointer;
   transition: var(--transition);
   font-size: 0.95rem;
-  border-bottom: 1px solid var(--border-muted);
+  border-bottom: none;
 }
 
 .sidebar-item:last-child {
@@ -443,7 +459,10 @@ body {
 /* ===== 帖子卡片 ===== */
 .post-card {
   background: var(--bg);
-  border: 1px solid var(--border);
+  opacity: 70%;
+  /*border: 1px solid var(--border);*/
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
   border-radius: var(--radius-lg);
   padding: 20px;
   margin-bottom: 12px;
@@ -454,6 +473,8 @@ body {
 .post-card:hover {
   border-color: #aaa;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.13);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px);
   transform: scale(1.018);
 }
 
@@ -469,7 +490,7 @@ body {
   height: 42px;
   background: var(--bg-inset);
   border-radius: 50%;
-  border: 1px solid var(--border);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -517,7 +538,7 @@ body {
   height: 90px;
   object-fit: cover;
   border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border: none;
 }
 
 /* 帖子操作栏 */
@@ -576,7 +597,7 @@ body {
 
 .widget {
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
@@ -689,7 +710,7 @@ body {
   align-items: center;
   gap: 4px;
   background: var(--bg-inset);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: 20px;
   padding: 2px 10px;
   font-size: 0.78rem;
@@ -702,7 +723,7 @@ body {
   flex: 1;
   min-width: 0;
   padding: 8px 12px;
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--radius);
   font-size: 0.875rem;
   background: var(--bg-subtle);
@@ -722,7 +743,7 @@ body {
 
 .comment-item {
   padding: 10px 0;
-  border-bottom: 1px solid var(--border-muted);
+  border-bottom: none;
 }
 
 .comment-item:last-child {
@@ -792,7 +813,8 @@ body {
 
 .msg-header {
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: none;
+
   border-radius: var(--radius-lg);
   padding: 12px 16px;
   display: flex;
@@ -813,7 +835,8 @@ body {
   height: 32px;
   background: var(--bg-inset);
   border-radius: 50%;
-  border: 1px solid var(--border);
+  border: none;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -828,7 +851,8 @@ body {
   overflow-y: auto;
   padding: 12px 16px;
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: none;
+
   border-radius: var(--radius-lg);
   margin-bottom: 8px;
   display: flex;
@@ -892,7 +916,8 @@ body {
 .bubble-theirs {
   background: var(--bg-inset);
   color: var(--text);
-  border: 1px solid var(--border);
+  border: none;
+
   border-bottom-left-radius: 4px;
 }
 
@@ -907,7 +932,8 @@ body {
 .quick-reply-panel {
   display: none;
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: none;
+
   border-radius: var(--radius-lg);
   padding: 12px 14px;
   margin-bottom: 8px;
@@ -935,7 +961,8 @@ body {
 
 .quick-reply-item {
   padding: 4px 12px;
-  border: 1px solid var(--border);
+  border: none;
+
   border-radius: 20px;
   background: var(--bg-subtle);
   font-size: 0.82rem;
@@ -955,13 +982,15 @@ body {
   gap: 6px;
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px solid var(--border-muted);
+  border: none;
+
 }
 
 .quick-reply-add input {
   flex: 1;
   padding: 5px 10px;
-  border: 1px solid var(--border);
+  border: none;
+
   border-radius: var(--radius);
   font-size: 0.82rem;
   background: var(--bg-subtle);
@@ -995,7 +1024,8 @@ body {
   align-items: flex-end;
   gap: 8px;
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: none;
+
   border-radius: var(--radius-lg);
   padding: 10px 12px;
 }
@@ -1003,7 +1033,8 @@ body {
 .msg-input {
   flex: 1;
   padding: 6px 10px;
-  border: 1px solid var(--border);
+  border: none;
+
   border-radius: var(--radius);
   font-size: 0.9rem;
   background: var(--bg-subtle);
@@ -1041,7 +1072,8 @@ body {
   width: 580px;
   max-width: 95vw;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
+  border: none;
+
   box-shadow: var(--shadow-md);
   overflow: hidden;
 }
@@ -1051,7 +1083,8 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 14px 18px;
-  border-bottom: 1px solid var(--border);
+  border: none;
+
 }
 
 .modal-header h3 {
@@ -1086,7 +1119,7 @@ body {
   gap: 8px;
   margin-bottom: 10px;
   padding-bottom: 10px;
-  border-bottom: 1px solid var(--border-muted);
+  border: none;
 }
 
 .publish-label {
@@ -1097,7 +1130,7 @@ body {
 
 .publish-category-select {
   padding: 4px 10px;
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--radius);
   font-size: 0.875rem;
   background: var(--bg);
@@ -1115,7 +1148,7 @@ body {
   width: 100%;
   min-height: 120px;
   padding: 10px 12px;
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--radius);
   font-size: 0.95rem;
   background: var(--bg-subtle);
@@ -1144,7 +1177,8 @@ body {
   height: 70px;
   object-fit: cover;
   border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border: none;
+
 }
 
 .modal-toolbar {
@@ -1159,7 +1193,7 @@ body {
   align-items: center;
   gap: 5px;
   padding: 4px 10px;
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--radius);
   background: var(--bg);
   color: var(--text-muted);
@@ -1181,7 +1215,7 @@ body {
   background: var(--bg-subtle);
   padding: 10px;
   border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border: none;
   margin: 8px 0;
 }
 
@@ -1207,7 +1241,8 @@ body {
   justify-content: flex-end;
   gap: 8px;
   padding: 12px 18px;
-  border-top: 1px solid var(--border);
+  border: none;
+
 }
 
 /* ===== 工具类 ===== */
@@ -1426,7 +1461,7 @@ em {
   align-items: center;
   gap: 10px;
   padding: 10px 16px;
-  border-bottom: 1px solid var(--border-muted);
+  border: none;
   cursor: pointer;
   transition: var(--transition);
   font-size: 0.97rem;
@@ -1489,7 +1524,8 @@ em {
   align-items: center;
   gap: 12px;
   padding: 12px 0;
-  border-bottom: 1px solid var(--border-muted);
+  border: none;
+
 }
 
 .following-item:last-child {
@@ -1501,7 +1537,8 @@ em {
   height: 40px;
   border-radius: 50%;
   background: var(--bg-inset);
-  border: 1px solid var(--border);
+  border: none;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1523,7 +1560,7 @@ em {
 .unfollow-btn {
   margin-left: auto;
   padding: 4px 12px;
-  border: 1px solid var(--border);
+  border: none;
   border-radius: 20px;
   background: var(--bg);
   font-size: 0.82rem;
@@ -1540,7 +1577,7 @@ em {
 
 .reply-notif-item {
   padding: 12px 0;
-  border-bottom: 1px solid var(--border-muted);
+  border: none;
 }
 
 .reply-notif-item:last-child {
@@ -1580,7 +1617,7 @@ em {
   align-items: center;
   gap: 8px;
   padding: 8px 0;
-  border-top: 1px solid var(--border-muted);
+  border: none;
   margin-top: 8px;
 }
 
@@ -1635,7 +1672,7 @@ em {
 .auto-reply-input {
   flex: 1;
   padding: 4px 8px;
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--radius);
   font-size: 0.82rem;
   background: var(--bg-subtle);
@@ -1653,7 +1690,7 @@ em {
 .follow-btn-card {
   flex-shrink: 0;
   padding: 4px 12px;
-  border: 1px solid var(--border);
+  border: none;
   border-radius: 20px;
   background: var(--bg);
   font-size: 0.8rem;
@@ -1690,7 +1727,7 @@ em {
   top: 48px;
   z-index: 500;
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   padding: 16px;
@@ -1730,7 +1767,7 @@ em {
 
 .ap-follow-btn {
   padding: 4px 18px;
-  border: 1px solid var(--border);
+  border: none;
   border-radius: 20px;
   background: var(--bg);
   font-size: 0.82rem;
