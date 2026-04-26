@@ -124,6 +124,11 @@ public class MarketController {
         }
 
         Item savedItem = marketService.saveItem(item);
+        List<String> images = (List<String>) request.get("images");
+        if (images != null) {
+            marketService.addImages(images, savedItem);
+        }
+
         return ResponseEntity.ok(convertToDTO(savedItem));
     }
 
@@ -173,6 +178,14 @@ public class MarketController {
     }
 
     private ItemDTO convertToDTO(Item item) {
+
+        List<ItemImage> images = marketService.findImagesByItem(item);
+        List<String> stringImageName = new ArrayList<>();
+
+        for (ItemImage image : images) {
+            stringImageName.add(image.getImageUrl());
+        }
+
         return ItemDTO.builder()
                 .itemId(item.getItemId())
                 .title(item.getTitle())
@@ -186,7 +199,7 @@ public class MarketController {
                 .category(item.getCategory())
                 .views(item.getViews())
                 .location(item.getLocation())
-                .images(Collections.emptyList()) // images are in a separate table
+                .images(stringImageName) // images are in a separate table
                 .build();
     }
 }

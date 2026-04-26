@@ -2,14 +2,12 @@ package org.neonangellock.azurecanvas.service.impl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import org.neonangellock.azurecanvas.model.Item;
-import org.neonangellock.azurecanvas.model.ItemCategory;
-import org.neonangellock.azurecanvas.model.TreeholePost;
-import org.neonangellock.azurecanvas.model.User;
+import org.neonangellock.azurecanvas.model.*;
 import org.neonangellock.azurecanvas.repository.ItemCategoryRepository;
 import org.neonangellock.azurecanvas.repository.ItemRepository;
 import org.neonangellock.azurecanvas.service.AbstractQueryService;
 import org.neonangellock.azurecanvas.service.IMarketService;
+import org.neonangellock.azurecanvas.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +28,9 @@ public class MarketServiceImpl extends AbstractQueryService implements IMarketSe
 
     @Autowired
     private ItemCategoryRepository categoryRepository;
+
+    @Autowired
+    private ImageService imageService;
 
     protected MarketServiceImpl(EntityManager entityManager) {
         super(entityManager);
@@ -68,6 +69,24 @@ public class MarketServiceImpl extends AbstractQueryService implements IMarketSe
         query.setParameter("lastLogout", OffsetDateTime.now());
 
         return query.getResultList();
+    }
+
+    @Override
+    @Transactional
+    public void addImages(List<String> urls, Item target){
+        for (String url : urls) {
+            ItemImage image = new ItemImage();
+            image.setImageId(UUID.fromString(url));
+            image.setItem(target);
+            image.setUploadedAt(OffsetDateTime.now());
+
+            entityManager.merge(image);
+        }
+    }
+
+    @Override
+    public List<ItemImage> findImagesByItem(Item item) {
+        return imageService.findByItem(item);
     }
 
     @Override

@@ -2,6 +2,7 @@ package org.neonangellock.azurecanvas.service;
 
 import org.neonangellock.azurecanvas.model.Item;
 import org.neonangellock.azurecanvas.model.ItemCategory;
+import org.neonangellock.azurecanvas.model.ItemImage;
 import org.neonangellock.azurecanvas.model.User;
 import org.springframework.data.domain.Page;
 
@@ -14,7 +15,8 @@ public interface IMarketService {
     Item findItemById(UUID itemId);
     Item saveItem(Item item);
     void deleteItem(UUID itemId);
-
+    void addImages(List<String> urls, Item item);
+    List<ItemImage> findImagesByItem(Item item);
     List<Item> findNewest();
     Page<Item> findItemsBySeller(User seller, String status, int page, int limit);
     List<ItemCategory> findAllCategories();

@@ -39,7 +39,7 @@ public class ItemFavoriteServiceImpl extends AbstractQueryService implements Ite
 
     private List<Item> findById(UUID userId, UUID itemId) {
         Query query = entityManager.createQuery(
-                "SELECT f FROM ItemFavorite f where f.liker.id = :userId AND f.item.id = :itemId");
+                "SELECT f FROM ItemFavorite f where f.user.id = :userId AND f.item.id = :itemId");
 
         query.setParameter("userId", userId);
         query.setParameter("itemId", itemId);

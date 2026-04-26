@@ -232,75 +232,75 @@ publishModal.addEventListener('click', function (e) {
     if (e.target === publishModal) closePublish();
 });
 
-publishForm.addEventListener('submit', async function (e) {
+publishForm.addEventListener('submit',  function (e) {
     e.preventDefault();
 
-    var formData = new FormData(publishForm);
-    var imageFiles = document.getElementById('publish-images').files;
+    // var formData = new FormData(publishForm);
+    // var imageFiles = document.getElementById('publish-images').files;
 
     // 先将图片转为 dataURL 存入 localStorage（支持0~9张）
-    var imagePromises = Array.from(imageFiles).slice(0, 9).map(function (file) {
-        return new Promise(function (resolve) {
-            var reader = new FileReader();
-            reader.onload = function (ev) { resolve(ev.target.result); };
-            reader.readAsDataURL(file);
-        });
-    });
-
-    var imageDataUrls = await Promise.all(imagePromises);
-    console.log(imageDataUrls)
-
-    // 构建本地存储对象
-    var item = {
-        id: Date.now().toString(),
-        title: formData.get('title'),
-        category: formData.get('category'),
-        description: formData.get('description'),
-        price: parseFloat(formData.get('price')),
-        condition: formData.get('condition'),
-        address: formData.get('address'),
-        images: imageDataUrls,
-        isUrgent: !!publishForm.querySelector('[name="isUrgent"]').checked,
-        isShippingFree: !!publishForm.querySelector('[name="isShippingFree"]').checked,
-        canInspect: !!publishForm.querySelector('[name="canInspect"]').checked,
-        createdAt: new Date().toISOString(),
-        status: 'available'
-    };
+    // var imagePromises = Array.from(imageFiles).slice(0, 9).map(function (file) {
+    //     return new Promise(function (resolve) {
+    //         var reader = new FileReader();
+    //         reader.onload = function (ev) { resolve(ev.target.result); };
+    //         reader.readAsDataURL(file);
+    //     });
+    // });
+    //
+    // var imageDataUrls = await Promise.all(imagePromises);
+    // console.log(imageDataUrls)
+    //
+    // // 构建本地存储对象
+    // var item = {
+    //     id: Date.now().toString(),
+    //     title: formData.get('title'),
+    //     category: formData.get('category'),
+    //     description: formData.get('description'),
+    //     price: parseFloat(formData.get('price')),
+    //     condition: formData.get('condition'),
+    //     address: formData.get('address'),
+    //     images: imageDataUrls,
+    //     isUrgent: !!publishForm.querySelector('[name="isUrgent"]').checked,
+    //     isShippingFree: !!publishForm.querySelector('[name="isShippingFree"]').checked,
+    //     canInspect: !!publishForm.querySelector('[name="canInspect"]').checked,
+    //     createdAt: new Date().toISOString(),
+    //     status: 'available'
+    // };
 
     // 无论 API 是否成功，都存入 localStorage
-    var published = JSON.parse(localStorage.getItem('publishedItems') || '[]');
-    published.unshift(item);
-    localStorage.setItem('publishedItems', JSON.stringify(published));
-    updateDropdownCounts();
-
-    // 尝试调用后端 API
-    var uploadData = new FormData();
-    uploadData.append('title', formData.get('title'));
-    uploadData.append('category', formData.get('category'));
-    uploadData.append('description', formData.get('description'));
-    uploadData.append('price', formData.get('price'));
-    Array.from(imageFiles).slice(0, 9).forEach(function (file) {
-        uploadData.append('images', file);
-    });
-
-    try {
-        var response = await fetch('/api/market/items', {
-            method: 'POST',
-            credentials: 'include',
-            body: uploadData
-        });
-
-        if (response.status === 401) {
-            showToast('请先登录');
-            window.location.href = '/login?redirect=/azure_trade/trade';
-            return;
-        }
-    } catch (err) {
-        console.warn('后端未连接，商品已保存到本地:', err);
-    }
-
-    closePublish();
-    showToast('发布成功！商品已上架');
+    // var published = JSON.parse(localStorage.getItem('publishedItems') || '[]');
+    // published.unshift(item);
+    // localStorage.setItem('publishedItems', JSON.stringify(published));
+    // updateDropdownCounts();
+    //
+    // // 尝试调用后端 API
+    // var uploadData = new FormData();
+    // uploadData.append('title', formData.get('title'));
+    // uploadData.append('category', formData.get('category'));
+    // uploadData.append('description', formData.get('description'));
+    // uploadData.append('price', formData.get('price'));
+    // Array.from(imageFiles).slice(0, 9).forEach(function (file) {
+    //     uploadData.append('images', file);
+    // });
+    //
+    // try {
+    //     var response = await fetch('/api/market/items', {
+    //         method: 'POST',
+    //         credentials: 'include',
+    //         body: uploadData
+    //     });
+    //
+    //     if (response.status === 401) {
+    //         showToast('请先登录');
+    //         window.location.href = '/login?redirect=/azure_trade/trade';
+    //         return;
+    //     }
+    // } catch (err) {
+    //     console.warn('后端未连接，商品已保存到本地:', err);
+    // }
+    //
+    // closePublish();
+    // showToast('发布成功！商品已上架');
 });
 
 // ========== 发布表单：描述字数统计 ==========
@@ -501,8 +501,165 @@ const submit_logic = function () {
         const isUrgent = document.getElementById('isUrgent').checked;
         const isShippingFree = document.getElementById('isShippingFree').checked;
         const canInspect = document.getElementById('canInspect').checked;
-        // For images, you would typically upload them separately or use FormData
-        // For now, we'll send an empty array or placeholder if the API expects it.
+
+
+        var publishForm = document.getElementById('publish-form'); // 替换为你的 form 的实际 ID
+        var imageInput = document.getElementById('publish-images'); // 假设你的 file input ID 是 publish-images
+
+// 检查元素是否存在
+        if (!publishForm || !imageInput) {
+            console.error("Form or image input element not found!");
+            // 你可以在这里添加错误处理，例如提示用户
+        } else {
+            // 监听表单提交事件
+
+            var formData = new FormData(publishForm); // 创建 FormData 对象
+            var imageFiles = imageInput.files; // 获取用户选择的文件
+
+            // 检查是否有文件被选中
+            if (imageFiles.length > 0) {
+                // 如果你想限制上传张数（例如 0~9 张）
+                // 并且只上传这些文件，而不是 form 中的其他数据
+                // 那么你可以这样做：
+                for (var i = 0; i < Math.min(imageFiles.length, 9); i++) {
+                    formData.append('files', imageFiles[i]); // 将每个文件添加到 FormData，字段名为 'file'
+                    // 注意：Spring Boot Controller 中 @RequestParam("file") 对应的是这个名字
+                }
+                // 如果你的 Controller 支持上传多文件，可以通过 @RequestParam("file") MultipartFile[] files
+                // 或者 @RequestPart("file") MultipartFile[] files 来接收。
+                // 但你目前的 Controller 是 @RequestParam("file") MultipartFile file，它一次只能接收一个文件。
+                // 如果你想一次上传多张图片，你需要修改 Controller。
+                //
+                // *** 重要修改 ***
+                // 你的 Spring Controller ImageUploadController.java 中的 @RequestParam("file") MultipartFile file
+                // 只能接收一个文件。如果你想一次上传多张图片，你需要修改 Controller 如下：
+                //
+                // 1. 接收多个文件：
+                //    @PostMapping("/upload")
+                //    public ResponseEntity<?> uploadImage(@RequestParam("files") MultipartFile[] files) { ... }
+                //    那么前端需要这样上传：
+                //    for (var i = 0; i < Math.min(imageFiles.length, 9); i++) {
+                //        formData.append('files', imageFiles[i]); // 注意字段名是 'files' (复数)
+                //    }
+                //
+                // 2. 保持 Controller 不变，但只上传第一张图片：
+                //    如果你想只上传第一张图片，那么你的 Controller 保持不变，前端这样上传：
+                //    formData.append('file', imageFiles[0]); // 只上传第一张
+                //
+                // 3. 循环上传（不推荐，效率低，并且一次上传一张图片）：
+                //    for (var i = 0; i < Math.min(imageFiles.length, 9); i++) {
+                //        var singleFormData = new FormData();
+                //        singleFormData.append('file', imageFiles[i]);
+                //        // 每次上传一张图片，需要单独发送请求
+                //        await uploadSingleImage(singleFormData);
+                //    }
+                //
+                // **假设你的 Controller 期望是接收一个名为 "file" 的单个文件**
+                // **如果你选择一次上传多张，需要修改 Controller**
+                // **下面的代码示例先假定 Controller 接收的是单个文件，并且你只上传第一张**
+                //
+                // --------------------------------------------------------------
+                // **版本 1：只上传第一张图片 (如果 Controller 期望单个 "file")**
+                // --------------------------------------------------------------
+                // formData.append('file', imageFiles[0]); // 只上传第一张图片
+                // // 之后发起上传请求...
+
+                // --------------------------------------------------------------
+                // **版本 2：假设 Controller 已修改为接收多个 "files" (MultipartFile[] files)**
+                // --------------------------------------------------------------
+                // for (var i = 0; i < Math.min(imageFiles.length, 9); i++) {
+                //     formData.append('files', imageFiles[i]); // 字段名改成 'files'
+                // }
+                // // 之后发起上传请求...
+
+                // *** 最常见的场景是 Controller 接收单个文件，前端上传第一张 ***
+                // *** 或者 Controller 接收多个文件，前端上传所有文件 ***
+                // *** 如果你的 Controller 期望是接收单个 "file"，但你需要上传多张，你需要循环调用 API，或者修改 Controller ***
+
+                // **我将按照上传一张图片（命名为 'file'）的 Controller 来写，如果你需要多张，请通知我，我会修改 Controller 的建议和前端代码。**
+                // **前提是 Controller 的 @RequestParam("file") MultipartFile file**
+                formData.append('files', imageFiles); // 示例：只上传第一张图片，因为 Controller 期望单个 "file"
+
+                // 发起 HTTP POST 请求
+                const uploadUrl = '/api/v1/images/upload'; // 你的 Spring Boot API 地址
+
+                try {
+                    const response = await fetch(uploadUrl, {
+                        method: 'POST',
+                        body: formData // 直接将 FormData 作为请求体
+                        // 'Content-Type' header is automatically set to 'multipart/form-data' with boundary by fetch when using FormData
+                        // No need to set it manually unless you encounter issues.
+                    });
+
+                    if (!response.ok) {
+                        // 请求不成功，处理错误
+                        const errorText = await response.text();
+                        console.error('Image upload failed:', response.status, errorText);
+                        // 你可以在这里显示错误信息给用户
+                        //TODO change to modal
+                        // alert('图片上传失败：' + (errorText || response.statusText));
+                    }
+
+                    // 请求成功
+                    const responseData = await response.json(); // 假设你的 API 返回 JSON
+                    console.log('Image uploaded successfully:', responseData);
+
+                    // responseData 应该包含 { "uuid": "...", "fileName": "..." }
+                    // 你可以根据需要使用返回的 UUID
+                    var uploadedImageUuid = responseData;
+                    // var uploadedImageFileName = responseData.fileName; // e.g., a1b2c3d4.webp
+
+                    // 假设你有一个隐藏字段来存储上传图片的 UUID
+                    var hiddenUuidField = document.createElement('input');
+                    hiddenUuidField.type = 'hidden';
+                    hiddenUuidField.name = 'uploadedImageUuid'; // 或其他你需要的名称
+                    hiddenUuidField.value = uploadedImageUuid;
+                    publishForm.appendChild(hiddenUuidField);
+
+                    // 你也可以将完整的 URL 存储起来，例如：
+                    // var imageUrl = 'http://localhost:8080/resources/' + uploadedImageUuid;
+                    // console.log("Image URL:", imageUrl);
+
+                    // 你可能还需要将图片的 URL 或 UUID 列表存入 publishForm 的其他字段，
+                    // 以便在表单提交时一起发送给后端。
+                    // 例如：
+                    // var imageUuidsArray = [];
+                    // // ... 如果上传了多张，需要收集所有 UUID ...
+                    // // 假设你上传的都是第一张，并且将其 UUID 存储在上面创建的 hiddenUuidField 中
+
+                    // 如果你想把 UUID 存储到 form 的一个特定字段中，以便在表单提交时一起发送
+                    // (假设你的 form 中有一个名为 "mainImageUuid" 的隐藏字段)
+                    var mainImageUuidField = publishForm.querySelector('input[name="mainImageUuid"]');
+                    if (mainImageUuidField) {
+                        mainImageUuidField.value = uploadedImageUuid;
+                    } else {
+                        // 如果不存在，可以创建一个
+                        var newMainImageUuidField = document.createElement('input');
+                        newMainImageUuidField.type = 'hidden';
+                        newMainImageUuidField.name = 'mainImageUuid';
+                        newMainImageUuidField.value = uploadedImageUuid;
+                        publishForm.appendChild(newMainImageUuidField);
+                    }
+
+                    // TODO: 如果需要上传多张图片，你需要修改 Controller，并在这里收集所有 UUID
+                    // 例如，在 localStorage 中保存一个 UUID 列表，或者将它们添加到 form 的其他字段。
+
+                    // 假设上传成功后，你可以继续进行表单的最终提交（如果需要）
+                    // publishForm.submit(); // 如果你想上传成功后，再触发表单的最终提交
+                    //alert('图片上传成功！UUID: ' + uploadedImageUuid);
+
+                } catch (error) {
+                    console.error('Error during image upload:', error);
+                    //TODO
+                    //alert('上传图片时发生错误。');
+                }
+            } else {
+                // 没有选择图片，仍然可以提交表单（如果需要）
+                console.log('No images selected, proceeding with form submission without images.');
+                //TODO
+                // publishForm.submit(); // 如果没有图片也要提交表单
+            }
+        }
 
         if (!title || !category || !description || isNaN(price) || isNaN(condition)) {
             window.notify.show('请填写所有必填项！', 'warning');
@@ -527,7 +684,7 @@ const submit_logic = function () {
                     isUrgent: isUrgent, // Assuming backend handles this
                     isShippingFree: isShippingFree, // Assuming backend handles this
                     canInspect: canInspect, // Assuming backend handles this
-                    images: [] // Placeholder for images
+                    images: uploadedImageUuid // Placeholder for images
                 })
             });
 
