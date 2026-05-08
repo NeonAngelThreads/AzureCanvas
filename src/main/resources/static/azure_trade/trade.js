@@ -72,7 +72,7 @@ async function fetchItemsFromApi(page, category, search) {
         
         var response = await fetch(API + '/api/market/items?' + params.toString(), {
             method: 'GET',
-            credentials:'include',
+            credentials:   'include',
             headers: { 'Content-Type': 'application/json' }
         });
         
@@ -100,6 +100,8 @@ function createApiCard(item, index) {
     var coverUrl = null;
     if (rawCoverUrl) {
         if (rawCoverUrl.startsWith('http')) {
+            coverUrl = rawCoverUrl;
+        } else if (rawCoverUrl.startsWith('/azure_trade/')) {
             coverUrl = rawCoverUrl;
         } else if (rawCoverUrl.startsWith('/')) {
             coverUrl = API + rawCoverUrl;
@@ -164,12 +166,84 @@ function createApiCard(item, index) {
     return card;
 }
 
+// ========== Render fixed recommendation cards (always shown in "For You") ==========
+function renderFixedCards() {
+    var fixedCard = document.createElement('div');
+    fixedCard.className = 'trade-recommend-card trade-fixed-card';
+    fixedCard.style.breakInside = 'avoid';
+    fixedCard.style.marginBottom = '1rem';
+    fixedCard.innerHTML =
+        '<div class="h-44 overflow-hidden"><img src="https://Yolanda9085.github.io/shanhuadi.jpg" class="w-full h-full object-cover" alt="Event Tickets"></div>' +
+        '<div class="p-3 flex flex-col flex-1">' +
+            '<div class="mb-1"><span class="trade-badge trade-badge--hot">Event Tickets</span> <span class="trade-badge trade-badge--fresh">VIP Ticket</span></div>' +
+            '<p class="text-sm text-gray-800 leading-snug line-clamp-2">Original price - Shanhuadi Sun Ruiyang Wang Ning VIP SVIP full ticket sequence number top 100 entry confirmed</p>' +
+            '<div class="mt-auto pt-2">' +
+                '<div class="flex items-center justify-between">' +
+                    '<span class="trade-price text-base">¥361</span>' +
+                    '<span class="text-xs text-gray-400">100 want this</span>' +
+                '</div>' +
+                '<div class="flex items-center mt-2 space-x-1.5">' +
+                    '<div class="w-5 h-5 rounded-full bg-purple-200 flex items-center justify-center text-[10px] text-purple-600 font-bold">T</div>' +
+                    '<span class="text-xs text-gray-500">Ticket Shop</span>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+    fixedCard.querySelector('img').onerror = function() {
+        this.parentElement.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-pink-300 to-rose-500 flex items-center justify-center text-6xl">🎫</div>';
+    };
+    fixedCard.addEventListener('click', function () {
+        window.location.href = 'product.html?fixed=1';
+    });
+
+    var fixedCard2 = document.createElement('div');
+    fixedCard2.className = 'trade-recommend-card trade-fixed-card';
+    fixedCard2.style.breakInside = 'avoid';
+    fixedCard2.style.marginBottom = '1rem';
+    fixedCard2.innerHTML =
+        '<div class="h-44 overflow-hidden"><img src="https://Yolanda9085.github.io/shanhuadi2.jpg" class="w-full h-full object-cover" alt="Shanhuadi"></div>' +
+        '<div class="p-3 flex flex-col flex-1">' +
+            '<div class="mb-1"><span class="trade-badge trade-badge--hot">Event Tickets</span> <span class="trade-badge trade-badge--fresh">Full Ticket</span></div>' +
+            '<p class="text-sm text-gray-800 leading-snug line-clamp-2">Shanhuadi Sun Ruiyang Wang Ning Shenzhen VIP SVIP original price transfer</p>' +
+            '<div class="mt-auto pt-2">' +
+                '<div class="flex items-center justify-between">' +
+                    '<span class="trade-price text-base">¥399</span>' +
+                    '<span class="text-xs text-gray-400">86 want this</span>' +
+                '</div>' +
+                '<div class="flex items-center mt-2 space-x-1.5">' +
+                    '<div class="w-5 h-5 rounded-full bg-purple-200 flex items-center justify-center text-[10px] text-purple-600 font-bold">T</div>' +
+                    '<span class="text-xs text-gray-500">Idle Tickets</span>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+    fixedCard2.querySelector('img').onerror = function() {
+        this.parentElement.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-violet-300 to-purple-500 flex items-center justify-center text-6xl">🎫</div>';
+    };
+    fixedCard2.addEventListener('click', function () {
+        sessionStorage.setItem('viewProduct', JSON.stringify({
+            id: 'shanhuadi2',
+            title: 'Shanhuadi Sun Ruiyang Wang Ning Shenzhen VIP SVIP original price transfer',
+            price: 399,
+            wants: 86,
+            views: 412,
+            description: 'Shanhuadi Sun Ruiyang Wang Ning Shenzhen show, VIP SVIP full ticket, purchased at original price, transferring due to schedule conflict, early sequence number, supports in-person ticket verification.',
+            seller: 'Idle Tickets',
+            tags: ['Event Tickets', 'Full Ticket'],
+            images: ['https://Yolanda9085.github.io/shanhuadi2.jpg']
+        }));
+        window.location.href = 'product.html?id=shanhuadi2';
+    });
+
+    return [fixedCard, fixedCard2];
+}
+
 // ========== Render API item list ==========
 function renderApiItems(items, append) {
     if (!append) {
         recommendGrid.innerHTML = '';
+        var fixedCards = renderFixedCards();
+        fixedCards.forEach(function(card) { recommendGrid.appendChild(card); });
     }
-    
+
     items.forEach(function(item, index) {
         var card = createApiCard(item, append ? apiState.items.length + index : index);
         recommendGrid.appendChild(card);
@@ -317,7 +391,7 @@ async function searchItemsES(keyword, page, limit) {
         var params = new URLSearchParams({ keyword: keyword, page: page || 1, limit: limit || 20 });
         var response = await fetch(API + '/api/market/search/es?' + params.toString(), {
             method: 'GET',
-            credentials: 'include'
+            credentials:   'include'
         });
         if (!response.ok) throw new Error('ES search failed');
         return await response.json();
@@ -385,66 +459,9 @@ function renderRecommend(seedFilter) {
 
     // Fixed cards only show in "For You" tab (seedFilter is null)
     if (!seedFilter) {
-    var fixedCard = document.createElement('div');
-    fixedCard.className = 'trade-recommend-card';
-    fixedCard.style.breakInside = 'avoid';
-    fixedCard.style.marginBottom = '1rem';
-    fixedCard.innerHTML =
-        '<div class="h-44 overflow-hidden"><img src="images/shanhuadi.jpg" class="w-full h-full object-cover" alt="Event Tickets"></div>' +
-        '<div class="p-3 flex flex-col flex-1">' +
-            '<div class="mb-1"><span class="trade-badge trade-badge--hot">Event Tickets</span> <span class="trade-badge trade-badge--fresh">VIP Ticket</span></div>' +
-            '<p class="text-sm text-gray-800 leading-snug line-clamp-2">Original price - Shanhuadi Sun Ruiyang Wang Ning VIP SVIP full ticket sequence number top 100 entry confirmed</p>' +
-            '<div class="mt-auto pt-2">' +
-                '<div class="flex items-center justify-between">' +
-                    '<span class="trade-price text-base">¥361</span>' +
-                    '<span class="text-xs text-gray-400">5 want this</span>' +
-                '</div>' +
-                '<div class="flex items-center mt-2 space-x-1.5">' +
-                    '<div class="w-5 h-5 rounded-full bg-purple-200 flex items-center justify-center text-[10px] text-purple-600 font-bold">T</div>' +
-                    '<span class="text-xs text-gray-500">Ticket Shop</span>' +
-                '</div>' +
-            '</div>' +
-        '</div>';
-    fixedCard.addEventListener('click', function () {
-        window.location.href = 'product.html?fixed=1';
-    });
-    recommendGrid.appendChild(fixedCard);
-
-    // Second shanhuadi card ¥399
-    var fixedCard2 = document.createElement('div');
-    fixedCard2.className = 'trade-recommend-card';
-    fixedCard2.style.breakInside = 'avoid';
-    fixedCard2.style.marginBottom = '1rem';
-    fixedCard2.innerHTML =
-        '<div class="h-44 overflow-hidden"><img src="images/shanhuadi2.jpg" class="w-full h-full object-cover" alt="Shanhuadi"></div>' +
-        '<div class="p-3 flex flex-col flex-1">' +
-            '<div class="mb-1"><span class="trade-badge trade-badge--hot">Event Tickets</span> <span class="trade-badge trade-badge--fresh">Full Ticket</span></div>' +
-            '<p class="text-sm text-gray-800 leading-snug line-clamp-2">Shanhuadi Sun Ruiyang Wang Ning Shenzhen VIP SVIP original price transfer</p>' +
-            '<div class="mt-auto pt-2">' +
-                '<div class="flex items-center justify-between">' +
-                    '<span class="trade-price text-base">¥399</span>' +
-                    '<span class="text-xs text-gray-400">8 want this</span>' +
-                '</div>' +
-                '<div class="flex items-center mt-2 space-x-1.5">' +
-                    '<div class="w-5 h-5 rounded-full bg-purple-200 flex items-center justify-center text-[10px] text-purple-600 font-bold">T</div>' +
-                    '<span class="text-xs text-gray-500">Idle Tickets</span>' +
-                '</div>' +
-            '</div>' +
-        '</div>';
-    fixedCard2.addEventListener('click', function () {
-        sessionStorage.setItem('viewProduct', JSON.stringify({
-            id: 'shanhuadi2',
-            title: 'Shanhuadi Sun Ruiyang Wang Ning Shenzhen VIP SVIP original price transfer',
-            price: 399,
-            description: 'Shanhuadi Sun Ruiyang Wang Ning Shenzhen show, VIP SVIP full ticket, purchased at original price, transferring due to schedule conflict, early sequence number, supports in-person ticket verification.',
-            seller: 'Idle Tickets',
-            tags: ['Event Tickets', 'Full Ticket'],
-            images: ['images/shanhuadi2.jpg']
-        }));
-        window.location.href = 'product.html?id=shanhuadi2';
-    });
-    recommendGrid.appendChild(fixedCard2);
-    } // end if (!seedFilter)
+        var fixedCards = renderFixedCards();
+        fixedCards.forEach(function(card) { recommendGrid.appendChild(card); });
+    }
 
     var cacheKey = 'recommendCache_' + (seedFilter ? JSON.stringify(seedFilter).substring(0, 30) : 'all');
     var picked;
@@ -503,12 +520,12 @@ function renderRecommend(seedFilter) {
 // ========== Recommendation feed tab switching ==========
 var tabSeedMap = {
     'For You': null,
-    'Personal Items': null,
+    'Personal Items': ['Electric Toothbrush', 'Perfume', 'Face Mask', 'Sunscreen', 'Lipstick', 'Foundation'],
     'Digital Devices': categoryMap['Phones/Digital/Computers'],
     'Textbooks': categoryMap['Textbooks/Study Materials'],
     'Instruments': categoryMap['Instruments/Stationery/Crafts'],
     'Photography': ['Mirrorless Camera','DSLR Camera'],
-    'Sports & Outdoors': categoryMap['Clothing/Bags/Sports'],
+    'Sports & Outdoors': ['Running Shoes', 'Basketball Shoes', 'Bicycle', 'Skateboard', 'Fitness Band'],
     'Women\'s Fashion': ['Dress','T-Shirt','Hoodie','Jacket','Jeans'],
     'Home & Living': categoryMap['Furniture/Appliances/Daily']
 };
@@ -766,7 +783,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const response = await fetch(API + '/api/users/me', {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
-            credentials: 'include'
+            credentials:   'include'
         });
 
         if (response.ok) {
@@ -978,7 +995,7 @@ const submit_logic = function () {
                 const errorData = await itemRes.json().catch(() => ({}));
                 if (itemRes.status === 401) {
                     showToast('Please log in first');
-                    window.location.href = '/login?redirect=/azure_trade/trade';
+                    window.location.href = '/login.html?redirect=/azure_trade/trade';
                     return;
                 }
                 throw new Error(errorData.message || 'Failed to list item');
@@ -1045,7 +1062,7 @@ async function favoriteItem(itemId) {
     try {
         var response = await fetch(API + '/api/market/items/favorite?itemId=' + encodeURIComponent(itemId), {
             method: 'POST',
-            credentials: 'include'
+            credentials:  'include'
         });
         return response.ok;
     } catch (error) {
@@ -1062,7 +1079,7 @@ async function getFavoriteItems() {
     try {
         var response = await fetch(API + '/api/market/items/favorites', {
             method: 'GET',
-            credentials: 'include'
+            credentials:   'include'
         });
         if (!response.ok) return [];
         return await response.json();
@@ -1080,7 +1097,7 @@ async function getCategories() {
     try {
         var response = await fetch(API + '/api/market/categories', {
             method: 'GET',
-            credentials: 'include'
+            credentials:   'include'
         });
         if (!response.ok) return [];
         return await response.json();
@@ -1101,7 +1118,7 @@ async function contactSeller(sellerId, message, itemId) {
     try {
         var response = await fetch(API + '/api/market/' + encodeURIComponent(sellerId) + '/contact', {
             method: 'POST',
-            credentials: 'include',
+            credentials:   'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: message, itemId: itemId })
         });

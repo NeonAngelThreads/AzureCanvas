@@ -49,7 +49,7 @@
                             <span id="seller-followers" class="font-black text-gray-900 text-lg">83</span>
                             <span class="text-gray-500">Followers</span>
                         </a>
-                        <a href="#" class="flex items-baseline gap-1 hover:text-purple-600 transition">
+                        <a href="#" id="following-link" class="flex items-baseline gap-1 hover:text-purple-600 transition">
                             <span id="seller-following" class="font-black text-gray-900 text-lg">32</span>
                             <span class="text-gray-500">Following</span>
                         </a>
@@ -113,6 +113,17 @@
                 </div>
             </div>
             <div id="followers-list" class="px-6 py-4 overflow-y-auto flex-1 space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- Following List Modal -->
+    <div id="following-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-2xl w-full max-w-lg mx-4 overflow-hidden shadow-2xl max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
+                <h2 class="text-lg font-black text-gray-900">Following (<span id="following-total">32</span>)</h2>
+                <button id="following-close-btn" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+            </div>
+            <div id="following-list" class="px-6 py-4 overflow-y-auto flex-1 space-y-3"></div>
         </div>
     </div>
 
@@ -343,6 +354,58 @@ followersModal.addEventListener('click', function(e) {
 
 followersSort.addEventListener('change', function(e) {
     renderFollowers(sortFollowers(e.target.value));
+});
+
+// Following list modal
+var followingData = [
+    { name: 'CampusDeals', avatar: 'C', bio: 'Best deals on campus supplies', fans: 2450 },
+    { name: 'TechTrader99', avatar: 'T', bio: 'Electronics & gadgets enthusiast', fans: 890 },
+    { name: 'BookWorm_Li', avatar: 'B', bio: 'Textbooks & study materials', fans: 1230 },
+    { name: 'StyleQueen', avatar: 'S', bio: 'Fashion & accessories', fans: 3100 },
+    { name: 'GadgetGuru', avatar: 'G', bio: 'Phone accessories & repairs', fans: 760 }
+];
+
+var followingModal = document.getElementById('following-modal');
+var followingLink = document.getElementById('following-link');
+var followingCloseBtn = document.getElementById('following-close-btn');
+var followingList = document.getElementById('following-list');
+
+function renderFollowing(data) {
+    followingList.innerHTML = '';
+    data.forEach(function(f) {
+        var div = document.createElement('div');
+        div.className = 'flex items-start justify-between';
+        div.innerHTML =
+            '<div class="flex items-center gap-3">' +
+                '<div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-sm text-purple-600 font-bold flex-shrink-0">' + f.avatar + '</div>' +
+                '<div class="flex flex-col">' +
+                    '<span class="text-sm font-bold text-gray-800">' + f.name + '</span>' +
+                    (f.bio ? '<p class="text-xs text-gray-500 mt-0.5 line-clamp-1">' + f.bio + '</p>' : '') +
+                    '<span class="text-[11px] text-gray-400 mt-1">Followers ' + f.fans + '</span>' +
+                '</div>' +
+            '</div>' +
+            '<button class="px-4 py-1.5 bg-purple-50 text-purple-600 rounded-full text-xs font-medium hover:bg-purple-100 transition shrink-0">Following</button>';
+        followingList.appendChild(div);
+    });
+}
+
+followingLink.addEventListener('click', function(e) {
+    e.preventDefault();
+    followingModal.classList.remove('hidden');
+    followingModal.classList.add('flex');
+    renderFollowing(followingData);
+});
+
+followingCloseBtn.addEventListener('click', function() {
+    followingModal.classList.add('hidden');
+    followingModal.classList.remove('flex');
+});
+
+followingModal.addEventListener('click', function(e) {
+    if (e.target === followingModal) {
+        followingModal.classList.add('hidden');
+        followingModal.classList.remove('flex');
+    }
 });
 
 // Initialize

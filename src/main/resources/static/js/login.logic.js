@@ -303,7 +303,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 
             // Redirect to the system
             let path = window.location.href.substring(window.location.href.indexOf("?redirect="));
-            let target = path.indexOf('=');
+            let target = path.substring(path.indexOf('=')+1);
             window.location.href = '../' + target;
             return;
         }

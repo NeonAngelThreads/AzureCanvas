@@ -360,7 +360,6 @@ Feel free to message anytime, fast replies.
     </main>
 
     <script src="api-config.js"></script>
-    <script src="../js/app/product.js"></script>
     <script>
     var API = window.API_BASE || '';
     // ===== ✨ AI Shopping Assistant (LLM / Demo Mode) =====
@@ -569,7 +568,7 @@ Feel free to message anytime, fast replies.
         try {
             var response = await fetch(API + '/api/market/items/' + itemId, {
                 method: 'GET',
-                credentials: 'include'
+                credentials:  'include'
             });
 
             if (!response.ok) {
@@ -601,7 +600,7 @@ Feel free to message anytime, fast replies.
                 renderCategoryTag(product.category);
             }
 
-            fetch(API + '/api/market/items/' + itemId + '/view', { method: 'POST', credentials: 'include' })
+            fetch(API + '/api/market/items/' + itemId + '/view', { method: 'POST', credentials:  'include' })
                 .then(function(r) { return r.json(); })
                 .then(function(d) { if (d.views) document.getElementById('product-views').textContent = d.views; })
                 .catch(function() {});
@@ -621,8 +620,10 @@ Feel free to message anytime, fast replies.
             var item = JSON.parse(stored);
             document.getElementById('product-title').textContent = item.title || 'Product Details';
             document.getElementById('product-price').textContent = item.price || 0;
-            document.getElementById('product-wants').textContent = item.wants || 0;
-            document.getElementById('product-views').textContent = item.views || Math.floor(Math.random() * 200 + 50);
+            var wantsVal = item.wants || 0;
+            var viewsVal = item.views || (wantsVal + Math.floor(Math.random() * 300) + 50);
+            document.getElementById('product-wants').textContent = wantsVal;
+            document.getElementById('product-views').textContent = viewsVal;
             if (item.seller) {
                 document.getElementById('seller-name').textContent = item.seller;
                 document.getElementById('seller-avatar').textContent = item.seller.charAt(0);
@@ -657,6 +658,7 @@ Feel free to message anytime, fast replies.
         var normalizedImages = images.map(function(img) {
             if (!img) return img;
             if (img.startsWith('http')) return img;
+            if (img.startsWith('/azure_trade/')) return img;
             if (img.startsWith('/')) return API + img;
             if (img.startsWith('images/')) return img;
             return API + '/resources/' + img;
@@ -738,7 +740,7 @@ Feel free to message anytime, fast replies.
             '<span class="text-xs bg-purple-50 border border-purple-100 text-purple-600 px-2.5 py-1 rounded-lg font-bold">Authentic</span>' +
             '<span class="text-xs bg-green-50 border border-green-100 text-green-600 px-2.5 py-1 rounded-lg font-bold">Free Shipping</span>';
         var fixedImages = [
-            'images/shanhuadi.jpg'
+            'https://Yolanda9085.github.io/shanhuadi.jpg'
         ];
         var productImage = document.getElementById('product-image');
         productImage.className = 'w-full h-full transition-all duration-500';
@@ -750,6 +752,8 @@ Feel free to message anytime, fast replies.
         syncSellerInComments();
     } else if (pid) {
         loadProductDetail(pid);
+    } else {
+        loadFromSessionStorage();
     }
 
     function updateFavUI() {
@@ -781,7 +785,7 @@ Feel free to message anytime, fast replies.
         
         fetch(API + '/api/market/items/favorite?itemId=' + encodeURIComponent(pid), {
             method: 'POST',
-            credentials: 'include'
+            credentials:  'include'
         }).catch(function(err) { console.warn('Favorites API call failed:', err); });
 
         var titleEl = document.getElementById('product-title');
@@ -1140,9 +1144,13 @@ Feel free to message anytime, fast replies.
     function confirmPay() {
         document.getElementById('pay-confirm').classList.add('hidden');
         document.getElementById('pay-processing').classList.remove('hidden');
+
+        // Frontend simulated payment flow
         setTimeout(function() {
             document.getElementById('pay-processing').classList.add('hidden');
             document.getElementById('pay-success').classList.remove('hidden');
+            var buyBtn = document.getElementById('buy-btn');
+            if (buyBtn) { buyBtn.disabled = true; buyBtn.textContent = 'Sold'; buyBtn.classList.add('opacity-50'); }
             setTimeout(function() { closePayModal(); }, 2000);
         }, 1500);
     }
@@ -1477,6 +1485,15 @@ Feel free to message anytime, fast replies.
             { title: 'Board Game Catan', price: 100, emoji: '🎲', condition: '90% new', category: 'Collectibles' },
         ];
 
+        // MyListings items with images - used as barter pool for fixed/shanhuadi products
+        var MY_LISTINGS_BARTER_ITEMS = [
+            { title: 'Concert Ticket - Mayday 2026 Tour Front Row', price: 380, emoji: '🎤', condition: 'E-voucher', category: 'Tickets', images: ['https://Yolanda9085.github.io/ticket_concert.jpg'] },
+            { title: 'Theater Ticket - Mahua Comedy VIP Seat', price: 350, emoji: '🎭', condition: 'E-voucher', category: 'Tickets', images: ['https://Yolanda9085.github.io/ticket_drama.jpg'] },
+            { title: 'Music Festival Ticket - Strawberry Festival 2-Day Pass', price: 399, emoji: '🎵', condition: 'E-voucher', category: 'Tickets', images: ['https://Yolanda9085.github.io/ticket_festival.jpg'] },
+            { title: 'LiveHouse Ticket - Tell Five Front Row Standing', price: 340, emoji: '🎸', condition: 'E-voucher', category: 'Tickets', images: ['https://Yolanda9085.github.io/ticket_livehouse.jpg'] },
+            { title: 'Sony WH-1000XM4 Over-ear Noise Cancelling Headphones Black', price: 368, emoji: '🎧', condition: '95% new', category: 'Digital', images: ['https://Yolanda9085.github.io/cross_headphone.jpg'] }
+        ];
+
         async function startScanning() {
             showModalView('view-scanning');
 
@@ -1503,12 +1520,21 @@ Feel free to message anytime, fast replies.
                 document.getElementById('scanText').innerText = texts[i];
             }, 600);
 
-            var defaultItems = BARTER_ITEMS;
+            // Determine if this is a shanhuadi/fixed product - use restricted MyListings pool
+            var params = new URLSearchParams(window.location.search);
+            var isFixedProduct = params.get('fixed') === '1';
+            var isShanhuadi = params.get('id') === 'shanhuadi2';
+            var useMyListingsPool = isFixedProduct || isShanhuadi;
+
+            var defaultItems = useMyListingsPool ? MY_LISTINGS_BARTER_ITEMS : BARTER_ITEMS;
 
             var myItems = [];
-            try { myItems = JSON.parse(localStorage.getItem('publishedItems') || '[]'); } catch(e) {}
-            var pool = myItems.length > 0 ? myItems : defaultItems;
+            if (!useMyListingsPool) {
+                try { myItems = JSON.parse(localStorage.getItem('publishedItems') || '[]'); } catch(e) {}
+            }
+            var pool = useMyListingsPool ? defaultItems : (myItems.length > 0 ? myItems.concat(defaultItems) : defaultItems);
 
+            // For shanhuadi products, the target category is always 'Tickets'
             function guessCategory(title) {
                 if (/phone|digital|computer|headphone|watch|tablet|disk|camera|keyboard|mouse|monitor|laptop|iPad|iPhone|AirPods|Switch|Kindle|MacBook|Sony|Dell|Logitech|Samsung|Huawei|MatePad|hard drive|drone|GoPro|Marshall|speaker|Bose|DJI|PS5|Canon|Lenovo|Pencil|Xiaomi|手机|数码|电脑|耳机|板|盘|相机|键盘|鼠标|显示器|笔记本|戴尔|罗技|三星|华为|移动硬盘|无人机|音箱|头戴|索尼|佳能|联想|漫步者|小米手环/i.test(title)) return 'Digital';
                 if (/textbook|book|test|vocab|exam|notes|quiz|math|algebra|probability|politics|programming|algorithm|network|operating system|physics|economics|marxism|IELTS|Python|database|compiler|software|教材|书|真题|词汇|考研|四级|六级|笔记|试卷|高数|线代|概率论|政治|肖秀荣|张宇|C语言|程序设计|数据结构|算法|计算机网络|操作系统|物理实验|经济学|马克思|雅思|数据库|编译原理|软件工程/i.test(title)) return 'Textbooks';
@@ -1523,18 +1549,32 @@ Feel free to message anytime, fast replies.
                 return 'Collectibles';
             }
 
+            // For shanhuadi products, force category to 'Tickets'
+            var currentCategory = useMyListingsPool ? 'Tickets' : guessCategory(targetTitle);
+
             barterState.pool = pool;
             barterState.targetTitle = targetTitle;
             barterState.targetPrice = targetPrice;
-            barterState.currentCategory = guessCategory(targetTitle);
+            barterState.currentCategory = currentCategory;
             barterState.guessCategory = guessCategory;
             barterState.usedItems = [];
+            barterState.useMyListingsPool = useMyListingsPool;
 
             function filterCandidates(pool, tPrice, category, crossCategory) {
                 return pool.filter(function(item) {
                     var itemCat = item.category || guessCategory(item.title);
-                    var sameCategory = crossCategory ? true : itemCat === category;
-                    var closePrice = Math.abs(tPrice - item.price) <= 500;
+                    var sameCategory;
+                    if (useMyListingsPool) {
+                        // For shanhuadi: Tickets = same category, Digital (headphone) = cross category only
+                        if (crossCategory) {
+                            sameCategory = itemCat !== 'Tickets';
+                        } else {
+                            sameCategory = itemCat === 'Tickets';
+                        }
+                    } else {
+                        sameCategory = crossCategory ? true : itemCat === category;
+                    }
+                    var closePrice = useMyListingsPool ? true : Math.abs(tPrice - item.price) <= 500;
                     var notSame = item.title !== targetTitle.split('\n')[0];
                     return sameCategory && closePrice && notSame;
                 });
@@ -1549,6 +1589,27 @@ Feel free to message anytime, fast replies.
                         return barterState.usedItems.indexOf(c.title) === -1;
                     });
                     if (fresh.length > 0) candidates = fresh;
+                }
+
+                if (candidates.length === 0) {
+                    candidates = pool.filter(function(item) {
+                        var itemCat = item.category || guessCategory(item.title);
+                        var sameCategory;
+                        if (useMyListingsPool) {
+                            sameCategory = barterState.allowCrossCategory ? itemCat !== 'Tickets' : itemCat === 'Tickets';
+                        } else {
+                            sameCategory = barterState.allowCrossCategory ? true : itemCat === barterState.currentCategory;
+                        }
+                        var notSame = item.title !== targetTitle.split('\n')[0];
+                        return sameCategory && notSame;
+                    });
+                }
+
+                if (candidates.length === 0) {
+                    candidates = pool.filter(function(item) {
+                        var notSame = item.title !== targetTitle.split('\n')[0];
+                        return notSame;
+                    });
                 }
 
                 if (candidates.length === 0) {
@@ -1576,15 +1637,12 @@ Feel free to message anytime, fast replies.
                     }
                 }
 
-                if (matchPercent < 80) {
-                    return { picked: null, pickedPrice: 0, priceDiff: 0, matchPercent: 0 };
-                }
-
                 return { picked, pickedPrice, priceDiff, matchPercent };
             }
             barterState.doMatch = doMatch;
-            // Try AI first
+            // Try AI first (skip for MyListings restricted pool)
             var aiResult = null;
+            if (!useMyListingsPool) {
             try {
                 var itemList = pool.map(function(item, idx) {
                     return (idx + 1) + '. ' + item.title + ' - $' + item.price + ' (' + (item.condition || '') + ')';
@@ -1608,6 +1666,7 @@ Feel free to message anytime, fast replies.
                 aiResult = JSON.parse(aiContent);
             } catch(e) {
                 console.warn('AI matching failed, falling back to local data', e);
+            }
             }
 
             if (aiResult && aiResult.selectedIndex) {
@@ -1660,7 +1719,8 @@ Feel free to message anytime, fast replies.
                 if (picked.images && picked.images.length > 0) {
                     var imgUrl = picked.images[0];
                     if (!imgUrl.startsWith('http')) {
-                        if (imgUrl.startsWith('/')) imgUrl = API + imgUrl;
+                        if (imgUrl.startsWith('/azure_trade/')) { /* keep as-is */ }
+                        else if (imgUrl.startsWith('/')) imgUrl = API + imgUrl;
                         else if (imgUrl.startsWith('images/')) imgUrl = imgUrl;
                         else imgUrl = API + '/resources/' + imgUrl;
                     }
@@ -1755,7 +1815,8 @@ Feel free to message anytime, fast replies.
             if (picked.images && picked.images.length > 0) {
                 var imgUrl2 = picked.images[0];
                 if (!imgUrl2.startsWith('http')) {
-                    if (imgUrl2.startsWith('/')) imgUrl2 = API + imgUrl2;
+                    if (imgUrl2.startsWith('/azure_trade/')) { /* keep as-is */ }
+                    else if (imgUrl2.startsWith('/')) imgUrl2 = API + imgUrl2;
                     else if (imgUrl2.startsWith('images/')) imgUrl2 = imgUrl2;
                     else imgUrl2 = API + '/resources/' + imgUrl2;
                 }

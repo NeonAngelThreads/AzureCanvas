@@ -186,12 +186,14 @@
 
 
             <!-- ===== Left Category Sidebar ===== -->
-            <aside class="hidden lg:block w-56 shrink-0 bg-white rounded-xl p-4 shadow-sm self-start relative z-40 overflow-hidden">
+            <aside class="hidden lg:block w-56 shrink-0 bg-white rounded-xl p-4 shadow-sm self-start relative z-40">
                 <ul class="category-list text-xs text-gray-700 space-y-1">
                     <!-- 1. Phones/Digital/Computers -->
-                    <li class="group flex items-center space-x-1 cursor-pointer hover:text-purple-600 hover:bg-purple-50 rounded-lg px-2 py-2 -mx-2 font-medium overflow-hidden whitespace-nowrap" data-cat="Phones/Digital/Computers">
-                        <span>📱</span><span>Phones</span><span class="text-gray-300">/</span><span>Digital</span><span class="text-gray-300">/</span><span>Computers</span>
-                        <span class="ml-auto text-gray-300 text-xs">›</span>
+                    <li class="group relative flex items-center cursor-pointer hover:text-purple-600 hover:bg-purple-50 rounded-lg px-2 py-2 -mx-2 font-medium whitespace-nowrap" data-cat="Phones/Digital/Computers">
+                        <div class="flex items-center space-x-1 flex-1 min-w-0 overflow-hidden">
+                            <span>📱</span><span>Phones</span><span class="text-gray-300">/</span><span>Digital</span><span class="text-gray-300">/</span><span>Computers</span>
+                        </div>
+                        <span class="ml-1 text-gray-300 text-xs shrink-0">›</span>
                         <div class="hidden group-hover:block absolute left-full top-0 ml-1 w-[520px] bg-white rounded-xl shadow-xl p-5 z-50 border border-gray-100 text-gray-600 font-normal">
                             <div class="mb-4">
                                 <h4 class="text-xs font-bold text-purple-600 mb-2">Phones</h4>
@@ -232,9 +234,11 @@
                         </div>
                     </li>
                     <!-- 2. Fashion/Bags/Sports -->
-                    <li class="group flex items-center space-x-1 cursor-pointer hover:text-purple-600 hover:bg-purple-50 rounded-lg px-2 py-2 -mx-2 overflow-hidden whitespace-nowrap" data-cat="Fashion/Bags/Sports">
-                        <span>👗</span><span>Fashion</span><span class="text-gray-300">/</span><span>Bags</span><span class="text-gray-300">/</span><span>Sports</span>
-                        <span class="ml-auto text-gray-300 text-xs">›</span>
+                    <li class="group relative flex items-center cursor-pointer hover:text-purple-600 hover:bg-purple-50 rounded-lg px-2 py-2 -mx-2 whitespace-nowrap" data-cat="Fashion/Bags/Sports">
+                        <div class="flex items-center space-x-1 flex-1 min-w-0 overflow-hidden">
+                            <span>👗</span><span>Fashion</span><span class="text-gray-300">/</span><span>Bags</span><span class="text-gray-300">/</span><span>Sports</span>
+                        </div>
+                        <span class="ml-1 text-gray-300 text-xs shrink-0">›</span>
                         <div class="hidden group-hover:block absolute left-full top-0 ml-1 w-[520px] bg-white rounded-xl shadow-xl p-5 z-50 border border-gray-100 text-gray-600">
                             <div class="mb-4">
                                 <h4 class="text-xs font-bold text-purple-600 mb-2">Women's Clothing</h4>
@@ -276,9 +280,11 @@
                     </li>
 <!-- ASIDE_CHUNK_2 -->
                     <!-- 3. Games/Vouchers/Toys -->
-                    <li class="group flex items-center space-x-1 cursor-pointer hover:text-purple-600 hover:bg-purple-50 rounded-lg px-2 py-2 -mx-2 overflow-hidden whitespace-nowrap" data-cat="Games/Vouchers/Toys">
-                        <span>🎮</span><span>Games</span><span class="text-gray-300">/</span><span>Vouchers</span><span class="text-gray-300">/</span><span>Toys</span>
-                        <span class="ml-auto text-gray-300 text-xs">›</span>
+                    <li class="group relative flex items-center cursor-pointer hover:text-purple-600 hover:bg-purple-50 rounded-lg px-2 py-2 -mx-2 whitespace-nowrap" data-cat="Games/Vouchers/Toys">
+                        <div class="flex items-center space-x-1 flex-1 min-w-0 overflow-hidden">
+                            <span>🎮</span><span>Games</span><span class="text-gray-300">/</span><span>Vouchers</span><span class="text-gray-300">/</span><span>Toys</span>
+                        </div>
+                        <span class="ml-1 text-gray-300 text-xs shrink-0">›</span>
                         <div class="hidden group-hover:block absolute left-full top-0 ml-1 w-[520px] bg-white rounded-xl shadow-xl p-5 z-50 border border-gray-100 text-gray-600">
                             <div class="mb-4">
                                 <h4 class="text-xs font-bold text-purple-600 mb-2">Consoles & Handhelds</h4>
@@ -313,9 +319,11 @@
                         </div>
                     </li>
                     <!-- 4. Textbooks/Study Materials -->
-                    <li class="group flex items-center space-x-1 cursor-pointer hover:text-purple-600 hover:bg-purple-50 rounded-lg px-2 py-2 -mx-2 overflow-hidden whitespace-nowrap" data-cat="Textbooks/Study Materials">
-                        <span>📚</span><span>Textbooks</span><span class="text-gray-300">/</span><span>Study</span><span class="text-gray-300">/</span><span>Materials</span>
-                        <span class="ml-auto text-gray-300 text-xs">›</span>
+                    <li class="group relative flex items-center cursor-pointer hover:text-purple-600 hover:bg-purple-50 rounded-lg px-2 py-2 -mx-2 whitespace-nowrap" data-cat="Textbooks/Study Materials">
+                        <div class="flex items-center space-x-1 flex-1 min-w-0 overflow-hidden">
+                            <span>📚</span><span>Textbooks</span><span class="text-gray-300">/</span><span>Study</span><span class="text-gray-300">/</span><span>Materials</span>
+                        </div>
+                        <span class="ml-1 text-gray-300 text-xs shrink-0">›</span>
                         <div class="hidden group-hover:block absolute left-full top-0 ml-1 w-[520px] bg-white rounded-xl shadow-xl p-5 z-50 border border-gray-100 text-gray-600">
                             <div class="mb-4">
                                 <h4 class="text-xs font-bold text-purple-600 mb-2">STEM Textbooks</h4>
@@ -349,10 +357,12 @@
                             </div>
                         </div>
                     </li>
-                    <!-- 5. Furniture/Appliances/Daily -->
-                    <li class="group flex items-center space-x-1 cursor-pointer hover:text-purple-600 hover:bg-purple-50 rounded-lg px-2 py-2 -mx-2 overflow-hidden whitespace-nowrap" data-cat="Furniture/Appliances/Daily">
-                        <span>🏠</span><span>Furniture</span><span class="text-gray-300">/</span><span>Appliances</span><span class="text-gray-300">/</span><span>Daily</span>
-                        <span class="ml-auto text-gray-300 text-xs">›</span>
+                    <!-- 5. Furniture/Appliances -->
+                    <li class="group relative flex items-center cursor-pointer hover:text-purple-600 hover:bg-purple-50 rounded-lg px-2 py-2 -mx-2 whitespace-nowrap" data-cat="Furniture/Appliances">
+                        <div class="flex items-center space-x-1 flex-1 min-w-0 overflow-hidden">
+                            <span>🏠</span><span>Furniture</span><span class="text-gray-300">/</span><span>Appliances</span>
+                        </div>
+                        <span class="ml-1 text-gray-300 text-xs shrink-0">›</span>
                         <div class="hidden group-hover:block absolute left-full top-0 ml-1 w-[520px] bg-white rounded-xl shadow-xl p-5 z-50 border border-gray-100 text-gray-600">
                             <div class="mb-4">
                                 <h4 class="text-xs font-bold text-purple-600 mb-2">Furniture</h4>
@@ -387,10 +397,12 @@
                         </div>
                     </li>
 <!-- ASIDE_CHUNK_3 -->
-                    <!-- 6. Beauty/Skincare/Personal Care -->
-                    <li class="group flex items-center space-x-1 cursor-pointer hover:text-purple-600 hover:bg-purple-50 rounded-lg px-2 py-2 -mx-2 overflow-hidden whitespace-nowrap" data-cat="Beauty/Skincare/Personal Care">
-                        <span>💄</span><span>Beauty</span><span class="text-gray-300">/</span><span>Skincare</span><span class="text-gray-300">/</span><span>Personal</span>
-                        <span class="ml-auto text-gray-300 text-xs">›</span>
+                    <!-- 6. Beauty/Skincare/Care -->
+                    <li class="group relative flex items-center cursor-pointer hover:text-purple-600 hover:bg-purple-50 rounded-lg px-2 py-2 -mx-2 whitespace-nowrap" data-cat="Beauty/Skincare/Care">
+                        <div class="flex items-center space-x-1 flex-1 min-w-0 overflow-hidden">
+                            <span>💄</span><span>Beauty</span><span class="text-gray-300">/</span><span>Skincare</span><span class="text-gray-300">/</span><span>Care</span>
+                        </div>
+                        <span class="ml-1 text-gray-300 text-xs shrink-0">›</span>
                         <div class="hidden group-hover:block absolute left-full top-0 ml-1 w-[520px] bg-white rounded-xl shadow-xl p-5 z-50 border border-gray-100 text-gray-600">
                             <div class="mb-4">
                                 <h4 class="text-xs font-bold text-purple-600 mb-2">Makeup</h4>
@@ -418,10 +430,12 @@
                             </div>
                         </div>
                     </li>
-                    <!-- 7. Instruments/Stationery/Crafts -->
-                    <li class="group flex items-center space-x-1 cursor-pointer hover:text-purple-600 hover:bg-purple-50 rounded-lg px-2 py-2 -mx-2 overflow-hidden whitespace-nowrap" data-cat="Instruments/Stationery/Crafts">
-                        <span>🎵</span><span>Instruments</span><span class="text-gray-300">/</span><span>Stationery</span><span class="text-gray-300">/</span><span>Crafts</span>
-                        <span class="ml-auto text-gray-300 text-xs">›</span>
+                    <!-- 7. Instruments/Stationery -->
+                    <li class="group relative flex items-center cursor-pointer hover:text-purple-600 hover:bg-purple-50 rounded-lg px-2 py-2 -mx-2 whitespace-nowrap" data-cat="Instruments/Stationery">
+                        <div class="flex items-center space-x-1 flex-1 min-w-0 overflow-hidden">
+                            <span>🎵</span><span>Instruments</span><span class="text-gray-300">/</span><span>Stationery</span>
+                        </div>
+                        <span class="ml-1 text-gray-300 text-xs shrink-0">›</span>
                         <div class="hidden group-hover:block absolute left-full top-0 ml-1 w-[520px] bg-white rounded-xl shadow-xl p-5 z-50 border border-gray-100 text-gray-600">
                             <div class="mb-4">
                                 <h4 class="text-xs font-bold text-purple-600 mb-2">Guitar & Strings</h4>
@@ -456,9 +470,11 @@
                         </div>
                     </li>
                     <!-- 8. Transport/Rental/Other -->
-                    <li class="group flex items-center space-x-1 cursor-pointer hover:text-purple-600 hover:bg-purple-50 rounded-lg px-2 py-2 -mx-2 overflow-hidden whitespace-nowrap" data-cat="Transport/Rental/Other">
-                        <span>🚲</span><span>Transport</span><span class="text-gray-300">/</span><span>Rental</span><span class="text-gray-300">/</span><span>Other</span>
-                        <span class="ml-auto text-gray-300 text-xs">›</span>
+                    <li class="group relative flex items-center cursor-pointer hover:text-purple-600 hover:bg-purple-50 rounded-lg px-2 py-2 -mx-2 whitespace-nowrap" data-cat="Transport/Rental/Other">
+                        <div class="flex items-center space-x-1 flex-1 min-w-0 overflow-hidden">
+                            <span>🚲</span><span>Transport</span><span class="text-gray-300">/</span><span>Rental</span><span class="text-gray-300">/</span><span>Other</span>
+                        </div>
+                        <span class="ml-1 text-gray-300 text-xs shrink-0">›</span>
                         <div class="hidden group-hover:block absolute left-full top-0 ml-1 w-[520px] bg-white rounded-xl shadow-xl p-5 z-50 border border-gray-100 text-gray-600">
                             <div class="mb-4">
                                 <h4 class="text-xs font-bold text-purple-600 mb-2">Transportation</h4>
@@ -610,9 +626,9 @@
                 <option>Textbooks/Study Materials</option>
                 <option>Clothing/Bags/Sports</option>
                 <option>Gaming/Vouchers/Collectibles</option>
-                <option>Furniture/Appliances/Daily</option>
-                <option>Beauty/Skincare/Personal Care</option>
-                <option>Instruments/Stationery/Crafts</option>
+                <option>Furniture/Appliances</option>
+                <option>Beauty/Skincare/Care</option>
+                <option>Instruments/Stationery</option>
                 <option>Transport/Rental/Other</option>
             </select>
         </div>

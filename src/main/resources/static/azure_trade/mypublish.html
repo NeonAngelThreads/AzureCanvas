@@ -178,11 +178,11 @@
 var API = window.API_BASE || '';
 var currentUsername = '';
 var pubItems = [
-    { id:'ticket_1', title:'Concert Ticket - Mayday 2026 Tour Front Row', price:380, emoji:'🎤', bg:'from-pink-100 to-rose-200', wants:28, views:412, status:'selling', time:'3 hours ago', category:'Games/Vouchers/Collectibles', description:'Mayday 2026 tour concert, front row seat, schedule conflict forces sale, bought at original price, no bargaining.', images:['images/ticket_concert.jpg'] },
-    { id:'ticket_2', title:'Theater Ticket - Mahua Comedy VIP Seat', price:350, emoji:'🎭', bg:'from-violet-100 to-purple-200', wants:15, views:267, status:'selling', time:'5 hours ago', category:'Games/Vouchers/Collectibles', description:'Mahua immersive theater VIP interactive seat with dinner, Saturday show, cannot attend, selling at original price.', images:['images/ticket_drama.jpg'] },
-    { id:'ticket_3', title:'Music Festival Ticket - Strawberry Festival 2-Day Pass', price:399, emoji:'🎵', bg:'from-green-100 to-emerald-200', wants:32, views:523, status:'selling', time:'1 day ago', category:'Games/Vouchers/Collectibles', description:'2026 Strawberry Music Festival two-day pass, amazing lineup, business trip forces sale.', images:['images/ticket_festival.jpg'] },
-    { id:'ticket_4', title:'LiveHouse Ticket - Tell Five Front Row Standing', price:340, emoji:'🎸', bg:'from-amber-100 to-orange-200', wants:19, views:301, status:'selling', time:'2 days ago', category:'Games/Vouchers/Collectibles', description:'Tell Five tour front row standing ticket, gift from friend but have an exam that day, selling cheap.', images:['images/ticket_livehouse.jpg'] },
-    { id:'cross_1', title:'Sony WH-1000XM4 Over-ear Noise Cancelling Headphones Black', price:368, emoji:'🎧', bg:'from-slate-100 to-gray-200', wants:22, views:389, status:'selling', time:'1 day ago', category:'Phones/Digital/Computers', description:'Sony WH-1000XM4 wireless noise cancelling headphones, black, owned for one year, 95% new condition, excellent noise cancellation, all accessories included with original case. Selling because upgraded to XM5.', images:['images/cross_headphone.jpg'] },
+    { id:'ticket_1', title:'Concert Ticket - Mayday 2026 Tour Front Row', price:380, emoji:'🎤', bg:'from-pink-100 to-rose-200', wants:28, views:412, status:'selling', time:'3 hours ago', category:'Games/Vouchers/Collectibles', description:'Mayday 2026 tour concert, front row seat, schedule conflict forces sale, bought at original price, no bargaining.', images:['https://Yolanda9085.github.io/ticket_concert.jpg'] },
+    { id:'ticket_2', title:'Theater Ticket - Mahua Comedy VIP Seat', price:350, emoji:'🎭', bg:'from-violet-100 to-purple-200', wants:15, views:267, status:'selling', time:'5 hours ago', category:'Games/Vouchers/Collectibles', description:'Mahua immersive theater VIP interactive seat with dinner, Saturday show, cannot attend, selling at original price.', images:['https://Yolanda9085.github.io/ticket_drama.jpg'] },
+    { id:'ticket_3', title:'Music Festival Ticket - Strawberry Festival 2-Day Pass', price:399, emoji:'🎵', bg:'from-green-100 to-emerald-200', wants:32, views:523, status:'selling', time:'1 day ago', category:'Games/Vouchers/Collectibles', description:'2026 Strawberry Music Festival two-day pass, amazing lineup, business trip forces sale.', images:['https://Yolanda9085.github.io/ticket_festival.jpg'] },
+    { id:'ticket_4', title:'LiveHouse Ticket - Tell Five Front Row Standing', price:340, emoji:'🎸', bg:'from-amber-100 to-orange-200', wants:19, views:301, status:'selling', time:'2 days ago', category:'Games/Vouchers/Collectibles', description:'Tell Five tour front row standing ticket, gift from friend but have an exam that day, selling cheap.', images:['https://Yolanda9085.github.io/ticket_livehouse.jpg'] },
+    { id:'cross_1', title:'Sony WH-1000XM4 Over-ear Noise Cancelling Headphones Black', price:368, emoji:'🎧', bg:'from-slate-100 to-gray-200', wants:22, views:389, status:'selling', time:'1 day ago', category:'Phones/Digital/Computers', description:'Sony WH-1000XM4 wireless noise cancelling headphones, black, owned for one year, 95% new condition, excellent noise cancellation, all accessories included with original case. Selling because upgraded to XM5.', images:['https://Yolanda9085.github.io/cross_headphone.jpg'] },
     { id:'p1', title:'Mechanical Keyboard + Mouse Combo for Coding', price:150, emoji:'⌨️', bg:'from-indigo-100 to-purple-200', wants:12, views:89, status:'selling', time:'2 hours ago' },
     { id:'p2', title:'Advanced Mathematics Tongji 7th Ed. Upper & Lower - Like New', price:15, emoji:'📘', bg:'from-blue-100 to-sky-200', wants:8, views:156, status:'selling', time:'5 hours ago' },
     { id:'p3', title:'iPad Air5 64G WiFi Blue with Pencil and Case', price:2800, emoji:'📱', bg:'from-cyan-100 to-teal-200', wants:25, views:342, status:'selling', time:'1 day ago' },
@@ -196,20 +196,25 @@ var pubItems = [
     var barterItems = pubItems.filter(function(i) { return i.id.startsWith('ticket_') || i.id.startsWith('cross_'); });
     var existing = [];
     try { existing = JSON.parse(localStorage.getItem('publishedItems') || '[]'); } catch(e) {}
-    var existingIds = existing.map(function(i) { return i.id; });
+    var existingMap = {};
+    existing.forEach(function(i, idx) { existingMap[i.id] = idx; });
     barterItems.forEach(function(t) {
-        if (existingIds.indexOf(t.id) === -1) {
-            existing.push({
-                id: t.id,
-                title: t.title,
-                price: t.price,
-                category: t.category,
-                description: t.description,
-                images: t.images,
-                emoji: t.emoji,
-                status: 'available',
-                createdAt: new Date().toISOString()
-            });
+        var barterCategory = t.id.startsWith('ticket_') ? 'Tickets' : 'Digital';
+        var item = {
+            id: t.id,
+            title: t.title,
+            price: t.price,
+            category: barterCategory,
+            description: t.description,
+            images: t.images,
+            emoji: t.emoji,
+            status: 'available',
+            createdAt: new Date().toISOString()
+        };
+        if (existingMap[t.id] !== undefined) {
+            existing[existingMap[t.id]] = item;
+        } else {
+            existing.push(item);
         }
     });
     localStorage.setItem('publishedItems', JSON.stringify(existing));
@@ -258,11 +263,11 @@ function renderPublished(filter) {
         if (item.images && item.images.length > 0) {
             var imgSrc = item.images[0];
             if (!imgSrc.startsWith('http')) {
-                if (imgSrc.startsWith('/')) imgSrc = API + imgSrc;
+                if (imgSrc.startsWith('/') && !imgSrc.startsWith('/azure_trade/')) imgSrc = API + imgSrc;
                 else if (imgSrc.startsWith('images/')) imgSrc = imgSrc;
                 else imgSrc = API + '/resources/' + imgSrc;
             }
-            imgHtml = '<img src="' + imgSrc + '" class="w-full h-full object-cover">';
+            imgHtml = '<img src="' + imgSrc + '" class="w-full h-full object-cover" data-emoji="' + (item.emoji || '📦') + '" data-bg="' + (item.bg || 'from-gray-100 to-gray-200') + '">';
         } else {
             imgHtml = '<div class="w-full h-full bg-gradient-to-br ' + item.bg + ' flex items-center justify-center text-3xl">' + item.emoji + '</div>';
         }
@@ -308,6 +313,15 @@ function renderPublished(filter) {
         });
 
         list.appendChild(card);
+    });
+
+    // Add onerror fallback for all item images
+    list.querySelectorAll('img[data-emoji]').forEach(function(img) {
+        img.onerror = function() {
+            var emoji = this.getAttribute('data-emoji') || '📦';
+            var bg = this.getAttribute('data-bg') || 'from-gray-100 to-gray-200';
+            this.parentElement.innerHTML = '<div class="w-full h-full bg-gradient-to-br ' + bg + ' flex items-center justify-center text-3xl">' + emoji + '</div>';
+        };
     });
 }
 // Delist item
@@ -363,7 +377,7 @@ function openEditModal(item) {
     preview.innerHTML = '';
     if (item.images && item.images.length > 0) {
         item.images.forEach(function(img) {
-            var imgSrc = img.startsWith('http') ? img : (img.startsWith('/') ? API + img : (img.startsWith('images/') ? img : API + '/resources/' + img));
+            var imgSrc = img.startsWith('http') ? img : (img.startsWith('/azure_trade/') ? img : (img.startsWith('/') ? API + img : (img.startsWith('images/') ? img : API + '/resources/' + img)));
             var div = document.createElement('div');
             div.className = 'w-16 h-16 rounded-lg overflow-hidden border border-gray-200';
             div.innerHTML = '<img src="' + imgSrc + '" class="w-full h-full object-cover">';
@@ -437,7 +451,7 @@ editForm.addEventListener('submit', async function(e) {
         var res = await fetch(API + '/api/market/items/' + itemId, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            credentials:  'include',
+            credentials:   'include',
             body: JSON.stringify(data)
         });
         if (res.ok) {
@@ -459,4 +473,66 @@ editForm.addEventListener('submit', async function(e) {
         showToast('Network error');
     }
 });
-<!-- MYPUBLISH_SCRIPT5_CONTINUE -->
+
+var currentFilter = 'all';
+
+// Tab switching
+document.querySelectorAll('.pub-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.pub-tab').forEach(function(t) {
+            t.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600', 'font-bold');
+            t.classList.add('text-gray-500');
+        });
+        this.classList.remove('text-gray-500');
+        this.classList.add('text-purple-600', 'border-b-2', 'border-purple-600', 'font-bold');
+        currentFilter = this.dataset.filter || 'all';
+        renderPublished(currentFilter);
+    });
+});
+
+// Load user info and items from API
+(async function() {
+    try {
+        var userRes = await fetch(API + '/api/users/me', { credentials:   'include' });
+        if (userRes.ok) {
+            var user = await userRes.json();
+            currentUsername = user.username || user.nickname || '';
+            var usernameEl = document.getElementById('sidebar-username');
+            if (usernameEl) usernameEl.textContent = currentUsername;
+            var avatarEl = document.getElementById('sidebar-avatar');
+            if (avatarEl) avatarEl.textContent = currentUsername.charAt(0).toUpperCase();
+        }
+    } catch(e) {}
+
+    try {
+        var itemsRes = await fetch(API + '/api/market/items/mine', { credentials:   'include' });
+        if (itemsRes.ok) {
+            var apiItems = await itemsRes.json();
+            if (apiItems && apiItems.length > 0) {
+                var mapped = apiItems.map(function(item) {
+                    return {
+                        id: item.itemId || item.id,
+                        title: item.title,
+                        price: item.price,
+                        emoji: '📦',
+                        bg: 'from-purple-100 to-pink-200',
+                        wants: item.wants || 0,
+                        views: item.views || 0,
+                        status: item.status === 'AVAILABLE' ? 'selling' : (item.status === 'SOLD' ? 'sold' : 'off'),
+                        time: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
+                        category: item.category || '',
+                        description: item.description || '',
+                        images: item.images || []
+                    };
+                });
+                pubItems = pubItems.concat(mapped);
+            }
+        }
+    } catch(e) {}
+
+    renderPublished(currentFilter);
+})();
+</script>
+
+</body>
+</html>

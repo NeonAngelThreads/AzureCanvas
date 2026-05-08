@@ -41,10 +41,7 @@
                     <span class="font-bold text-gray-800" id="chat-name">Select a conversation</span>
                 </div>
                 <div class="flex-1 overflow-y-auto p-6 hide-scrollbar" id="chat-messages">
-                    <div class="flex flex-col items-center justify-center h-full text-gray-300">
-                        <span class="text-5xl mb-3">💬</span>
-                        <p class="text-sm">Select a conversation on the left to start chatting</p>
-                    </div>
+    
                 </div>
                 <div class="bg-white border-t border-gray-200 px-4 py-3 flex-shrink-0">
                     <div class="flex items-center gap-2 mb-2 text-gray-400 text-xs">
@@ -66,32 +63,22 @@
         </div>
     </div>
 
+<script src="api-config.js"></script>
 <script>
-// ========== 数据 ==========
-var WORKER_URL = 'http://api.szsummer.com:8088';
-var currentUser = 'me';
+var API = window.API_BASE || '';
+var currentUser = '';
+var currentUserId = '';
+var conversations = [];
+var activeChatId = null;
+var activePartnerName = null;
 
-var conversations = [
-    { id: 'c1', name: 'GlassLover', avatar: '🧡', lastMsg: 'OK, it has been shipped', time: '14:30', unread: 1 },
-    { id: 'c2', name: 'Notifications', avatar: '🔔', lastMsg: 'Your item has been favorited', time: '12:00', unread: 0 },
-    { id: 'c3', name: 'LanCity API Store #3', avatar: '🏪', lastMsg: 'Study hard and come back to pay', time: 'Yesterday', unread: 0 },
-    { id: 'c4', name: 'Music Sharing Club', avatar: '🎵', lastMsg: 'Weekend event cancelled', time: 'Wed', unread: 0 },
-    { id: 'c5', name: 'SuperGreatToday', avatar: '☀️', lastMsg: 'here https://pan-park...', time: 'Tue', unread: 0 },
-    { id: 'c6', name: 'KittyCat Resources', avatar: '🐱', lastMsg: 'Already sent it', time: '4/5', unread: 0 }
-];
-
-var chatHistory = {
-    'c1': [
-        { from: 'them', product: { title: 'Glass Cup Set - Brand New Sealed', price: 1, emoji: '🥛' } },
-        { from: 'me', text: 'I have placed the order, please pay' },
-        { from: 'them', text: 'OK, it has been shipped' }
-    ],
-    'c3': [
-        { from: 'them', product: { title: 'Claude Full Model - Unlimited - Auto Delivery', price: 100, emoji: '💻' } },
-        { from: 'me', text: 'I have placed the order, please pay', tag: 'Pay Now' },
-        { from: 'them', text: 'Study hard and come back to pay' }
-    ]
-};
+// ========== Get current user from cookie ==========
+function getCookie(name) {
+    var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+}
+currentUserId = getCookie('user_id') || '';
+currentUser = getCookie('username') || 'me';
 
 // ========== DOM ==========
 var chatList = document.getElementById('chat-list');
@@ -99,8 +86,6 @@ var chatMessages = document.getElementById('chat-messages');
 var chatName = document.getElementById('chat-name');
 var msgInput = document.getElementById('msg-input');
 var sendBtn = document.getElementById('send-btn');
-var activeChatId = null;
-var currentUser = 'me';
 
 // ========== Emoji ==========
 var emojiBtn = document.getElementById('emoji-btn');
@@ -129,12 +114,23 @@ emojiPanel.addEventListener('click', function(e) {
 document.getElementById('file-input').addEventListener('change', function(e) {
     var file = e.target.files[0];
     if (!file) return;
+    if (!activePartnerName) return;
+
     var reader = new FileReader();
     reader.onload = function(event) {
-        appendMessage({ from: 'me', image: event.target.result, text: '' });
+        var imageData = event.target.result;
+        appendMessage({ from: 'me', image: imageData, text: '' });
         chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        fetch(API + '/api/messages/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ from: currentUser, to: activePartnerName, text: '', image: imageData, msgType: 'image' })
+        }).catch(function(err) { console.warn('Send image failed', err); });
     };
     reader.readAsDataURL(file);
+    e.target.value = '';
 });
 
 // ========== Render ==========
@@ -143,32 +139,55 @@ function renderChatList() {
     conversations.forEach(function(conv) {
         var div = document.createElement('div');
         div.className = 'chat-item flex items-center gap-3 px-4 py-3';
-        if (conv.id === activeChatId) div.classList.add('active');
+        if (conv.partnerName === activePartnerName) div.classList.add('active');
+        var avatar = conv.avatar || conv.partnerName.charAt(0).toUpperCase();
         div.innerHTML =
-            '<div class="w-11 h-11 rounded-full bg-gradient-to-br from-yellow-300 to-orange-400 flex items-center justify-center text-xl flex-shrink-0">' + conv.avatar + '</div>' +
+            '<div class="w-11 h-11 rounded-full bg-gradient-to-br from-purple-300 to-pink-400 flex items-center justify-center text-xl flex-shrink-0 text-white font-bold">' + avatar + '</div>' +
             '<div class="flex-1 min-w-0">' +
-                '<div class="flex items-center justify-between"><span class="text-sm font-bold text-gray-800 truncate">' + conv.name + '</span><span class="text-xs text-gray-400 flex-shrink-0 ml-2">' + conv.time + '</span></div>' +
-                '<p class="text-xs text-gray-500 truncate mt-0.5">' + conv.lastMsg + '</p>' +
-            '</div>' +
-            (conv.unread > 0 ? '<span class="w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center flex-shrink-0">' + conv.unread + '</span>' : '');
+                '<div class="flex items-center justify-between"><span class="text-sm font-bold text-gray-800 truncate">' + conv.partnerName + '</span></div>' +
+                '<p class="text-xs text-gray-500 truncate mt-0.5">' + (conv.lastMsg || '') + '</p>' +
+                '<span class="text-xs text-gray-400">' + formatTime(conv.lastTime) + '</span>' +
+            '</div>';
         div.addEventListener('click', function() { openChat(conv); });
         chatList.appendChild(div);
     });
 }
 
-function openChat(conv) {
-    activeChatId = conv.id;
-    chatName.textContent = conv.name;
-    conv.unread = 0;
-    renderChatList();
-    chatMessages.innerHTML = '';
-    var msgs = chatHistory[conv.id] || [];
-    if (msgs.length === 0) {
-        chatMessages.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-gray-300"><span class="text-5xl mb-3">💬</span><p class="text-sm">Start chatting with ' + conv.name + '</p></div>';
-    } else {
-        msgs.forEach(function(msg) { appendMessage(msg); });
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+function formatTime(ts) {
+    if (!ts) return '';
+    var d = new Date(ts);
+    var now = new Date();
+    if (d.toDateString() === now.toDateString()) {
+        return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
     }
+    var diff = Math.floor((now - d) / 86400000);
+    if (diff === 1) return 'Yesterday';
+    if (diff < 7) return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
+    return (d.getMonth()+1) + '/' + d.getDate();
+}
+
+function openChat(conv) {
+    activePartnerName = conv.partnerName;
+    chatName.textContent = conv.partnerName;
+    renderChatList();
+    chatMessages.innerHTML = '<div class="flex justify-center"><span class="text-xs text-gray-400">Loading...</span></div>';
+
+    fetch(API + '/api/messages/history?user=' + encodeURIComponent(currentUser) + '&partner=' + encodeURIComponent(conv.partnerName), {
+        credentials: 'include'
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(msgs) {
+        chatMessages.innerHTML = '';
+        if (msgs.length === 0) {
+            chatMessages.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-gray-300"><span class="text-5xl mb-3">💬</span><p class="text-sm">Start chatting with ' + conv.partnerName + '</p></div>';
+        } else {
+            msgs.forEach(function(msg) { appendMessage(msg); });
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    })
+    .catch(function() {
+        chatMessages.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-gray-300"><span class="text-5xl mb-3">💬</span><p class="text-sm">Start chatting with ' + conv.partnerName + '</p></div>';
+    });
 }
 
 function appendMessage(msg) {
@@ -176,24 +195,28 @@ function appendMessage(msg) {
     if (msg.from === 'me') {
         div.className = 'flex justify-end mb-4';
         var c = '';
-        if (msg.tag) c += '<div class="mb-1 text-right"><span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded">' + msg.tag + '</span></div>';
         if (msg.image) {
             c += '<div class="bg-yellow-400 text-gray-900 px-4 py-2.5 rounded-2xl rounded-tr-sm max-w-xs"><img src="' + msg.image + '" class="max-w-full rounded-lg" style="max-height:200px;" alt="Sent image"></div>';
         } else if (msg.text) {
-            c += '<div class="bg-yellow-400 text-gray-900 px-4 py-2.5 rounded-2xl rounded-tr-sm max-w-xs text-sm">' + msg.text + '</div>';
+            c += '<div class="bg-yellow-400 text-gray-900 px-4 py-2.5 rounded-2xl rounded-tr-sm max-w-xs text-sm">' + escapeHtml(msg.text) + '</div>';
         }
         div.innerHTML = '<div class="text-right">' + c + '</div>';
     } else {
         div.className = 'flex justify-start mb-4 gap-2';
         var inner = '';
-        if (msg.product) {
-            inner = '<div class="bg-white border border-gray-200 rounded-xl p-3 max-w-xs shadow-sm"><div class="flex gap-2"><div class="w-14 h-14 bg-gradient-to-br from-yellow-200 to-orange-300 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">' + msg.product.emoji + '</div><div class="flex-1 min-w-0"><p class="text-sm text-gray-800">' + msg.product.title + '</p><p class="text-orange-500 font-black text-sm mt-1">$' + msg.product.price.toFixed(2) + '</p></div></div></div>';
+        if (msg.image) {
+            inner = '<div class="bg-white px-4 py-2.5 rounded-2xl rounded-tl-sm max-w-xs shadow-sm border border-gray-100"><img src="' + msg.image + '" class="max-w-full rounded-lg" style="max-height:200px;" alt="Received image"></div>';
         } else {
-            inner = '<div class="bg-white px-4 py-2.5 rounded-2xl rounded-tl-sm max-w-xs text-sm shadow-sm border border-gray-100">' + msg.text + '</div>';
+            inner = '<div class="bg-white px-4 py-2.5 rounded-2xl rounded-tl-sm max-w-xs text-sm shadow-sm border border-gray-100">' + escapeHtml(msg.text || '') + '</div>';
         }
-        div.innerHTML = '<div class="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-300 to-orange-400 flex items-center justify-center text-sm flex-shrink-0 mt-1">👤</div><div>' + inner + '</div>';
+        div.innerHTML = '<div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-300 to-pink-400 flex items-center justify-center text-sm flex-shrink-0 mt-1 text-white font-bold">' + (activePartnerName ? activePartnerName.charAt(0) : '?') + '</div><div>' + inner + '</div>';
     }
     chatMessages.appendChild(div);
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ========== Send ==========
@@ -202,37 +225,107 @@ msgInput.addEventListener('keydown', function(e) { if (e.key === 'Enter' && !e.s
 
 function sendMessage() {
     var text = msgInput.value.trim();
-    if (!text || !activeChatId) return;
+    if (!text || !activePartnerName) return;
 
-    // 先显示在界面上
     appendMessage({ from: 'me', text: text });
     msgInput.value = '';
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // 发到服务器
-    var convName = '';
-    var conv = conversations.find(function(c) { return c.id === activeChatId; });
-    if (conv) { convName = conv.name; conv.lastMsg = text; conv.time = 'Just now'; }
-
-    fetch(WORKER_URL + '/api/msg/send', {
+    fetch(API + '/api/messages/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: currentUser, to: convName, text: text })
-    }).catch(function() {});
-
-    renderChatList();
+        credentials: 'include',
+        body: JSON.stringify({ from: currentUser, to: activePartnerName, text: text, msgType: 'text' })
+    }).then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            var conv = conversations.find(function(c) { return c.partnerName === activePartnerName; });
+            if (conv) { conv.lastMsg = text; conv.lastTime = new Date().toISOString(); }
+            renderChatList();
+        }
+    })
+    .catch(function(err) { console.warn('Send failed', err); });
 }
+
+// ========== Load conversations ==========
+function loadConversations() {
+    fetch(API + '/api/messages/conversations?user=' + encodeURIComponent(currentUser), {
+        credentials: 'include'
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        conversations = data.map(function(c) {
+            return { partnerName: c.partnerName, partnerId: c.partnerId, lastMsg: c.lastMsg || '', lastTime: c.lastTime, avatar: c.partnerName ? c.partnerName.charAt(0).toUpperCase() : '?' };
+        });
+        var urlParams = new URLSearchParams(window.location.search);
+        var sellerFromProduct = urlParams.get('seller');
+        if (sellerFromProduct) {
+            var exists = conversations.find(function(c) { return c.partnerName === sellerFromProduct; });
+            if (!exists) {
+                conversations.unshift({ partnerName: sellerFromProduct, lastMsg: '', lastTime: new Date().toISOString(), avatar: sellerFromProduct.charAt(0).toUpperCase() });
+            }
+        }
+        renderChatList();
+        if (sellerFromProduct) {
+            var conv = conversations.find(function(c) { return c.partnerName === sellerFromProduct; });
+            if (conv) openChat(conv);
+        }
+    })
+    .catch(function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var sellerFromProduct = urlParams.get('seller');
+        if (sellerFromProduct) {
+            conversations = [{ partnerName: sellerFromProduct, lastMsg: '', lastTime: new Date().toISOString(), avatar: sellerFromProduct.charAt(0).toUpperCase() }];
+            renderChatList();
+            openChat(conversations[0]);
+        }
+    });
+}
+
+// ========== Agent Quick Reply ==========
+var quickReplies = [
+    'Is this still available?',
+    'What\'s the lowest price?',
+    'Can we meet on campus?',
+    'Can I see more photos?',
+    'When is a good time to trade?',
+    'Is the condition as described?'
+];
+
+function showQuickReplies() {
+    var existing = document.getElementById('quick-reply-bar');
+    if (existing) existing.remove();
+    if (!activePartnerName) return;
+
+    var bar = document.createElement('div');
+    bar.id = 'quick-reply-bar';
+    bar.className = 'flex flex-wrap gap-2 px-4 py-2 border-t border-gray-100 bg-gray-50';
+    bar.innerHTML = '<span class="text-xs text-purple-500 font-bold mr-1 self-center">Quick:</span>';
+    var shuffled = quickReplies.slice().sort(function() { return 0.5 - Math.random(); }).slice(0, 3);
+    shuffled.forEach(function(text) {
+        var btn = document.createElement('button');
+        btn.className = 'text-xs bg-white border border-purple-200 text-purple-600 px-3 py-1.5 rounded-full hover:bg-purple-50 transition font-medium';
+        btn.textContent = text;
+        btn.addEventListener('click', function() {
+            msgInput.value = text;
+            msgInput.focus();
+            bar.remove();
+        });
+        bar.appendChild(btn);
+    });
+    var inputArea = document.querySelector('.bg-white.border-t');
+    if (inputArea) inputArea.insertBefore(bar, inputArea.firstChild);
+}
+
+// Show quick replies when opening a chat
+var _origOpenChat = openChat;
+openChat = function(conv) {
+    _origOpenChat(conv);
+    setTimeout(showQuickReplies, 300);
+};
 
 // ========== Init ==========
-var urlParams = new URLSearchParams(window.location.search);
-var sellerFromProduct = urlParams.get('seller');
-if (sellerFromProduct) {
-    var exists = conversations.find(function(c) { return c.name === sellerFromProduct; });
-    if (!exists) {
-        conversations.unshift({ id: 'new_' + Date.now(), name: sellerFromProduct, avatar: '👤', lastMsg: '', time: 'Just now', unread: 0 });
-    }
-}
-renderChatList();
+loadConversations();
 </script>
 
 </body>

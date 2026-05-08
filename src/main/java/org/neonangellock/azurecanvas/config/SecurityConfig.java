@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers(("/api/auth/**"))
                         .ignoringRequestMatchers(("/api/market/**"))
+                        .ignoringRequestMatchers(("/api/orders/**"))
                         .ignoringRequestMatchers(("/api/storymaps/**"))
                         .ignoringRequestMatchers(("/api/posts/**"))
                         .ignoringRequestMatchers("/api/users/**")
