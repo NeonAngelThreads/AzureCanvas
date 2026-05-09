@@ -20,10 +20,13 @@ AzureCanvas is a modern, playful, exquisite idea sharing forum website, which is
     <a href="">
       <img src="https://forthebadge.com/badges/uses-css.svg" alt="HTML5">
     </a>
-<a href="">
+    <a href="">
+      <img src="https://forthebadge.com/api/badges/generate?panels=2&primaryLabel=Made+with&secondaryLabel=Spring&primaryBGColor=%2366d9ff&primaryTextColor=%23FFFFFF&secondaryBGColor=%23004b7a&secondaryTextColor=%23FFFFFF&primaryFontSize=12&primaryFontWeight=600&primaryLetterSpacing=2&primaryFontFamily=Roboto&primaryTextTransform=uppercase&secondaryFontSize=12&secondaryFontWeight=900&secondaryLetterSpacing=2&secondaryFontFamily=Montserrat&secondaryTextTransform=uppercase&secondaryIcon=spring&secondaryIconColor=%2303d100&secondaryIconSize=24&secondaryIconPosition=left" alt="Spring">
+    </a>
+    <a href="">
       <img src="https://forthebadge.com/api/badges/generate?panels=2&primaryLabel=develop+with&secondaryLabel=tailwind.css&primaryBGColor=%234ccdca&primaryTextColor=%23FFFFFF&secondaryBGColor=%2383cdfb&secondaryTextColor=%23ffffff&primaryFontSize=12&primaryFontWeight=600&primaryLetterSpacing=2&primaryFontFamily=Roboto&primaryTextTransform=uppercase&secondaryFontSize=12&secondaryFontWeight=900&secondaryLetterSpacing=2&secondaryFontFamily=Montserrat&secondaryTextTransform=uppercase&secondaryIcon=tailwindcss&secondaryIconColor=%23FFFFFF&secondaryIconSize=24&secondaryIconPosition=left" alt="Tailwind.css">
     </a>
-  <a href="">
+    <a href="">
       <img src="https://forthebadge.com/api/badges/generate?panels=2&primaryLabel=3d+powered+by&secondaryLabel=three.js&primaryBGColor=%237ae2f0&primaryTextColor=%23FFFFFF&secondaryBGColor=%23389AD5&secondaryTextColor=%23FFFFFF&primaryFontSize=12&primaryFontWeight=600&primaryLetterSpacing=2&primaryFontFamily=Roboto&primaryTextTransform=uppercase&secondaryFontSize=12&secondaryFontWeight=900&secondaryLetterSpacing=2&secondaryFontFamily=Montserrat&secondaryTextTransform=uppercase&secondaryIcon=threedotjs&secondaryIconColor=%23FFFFFF&secondaryIconSize=24&secondaryIconPosition=left" alt="HTML5">
     </a>
     <a href="">

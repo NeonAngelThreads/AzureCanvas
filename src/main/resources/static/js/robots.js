@@ -320,6 +320,7 @@ function generatePost(id) {
     const robot = allRobots.find(r => r.id === id);
     if (robot) {
         robot.posts = (robot.posts || 0) + 1;
+        updateStats();
         showMessage('Post generated successfully');
         addLog(robot.name, 'Generated a post');
     }
@@ -329,6 +330,7 @@ function generateReply(id) {
     const robot = allRobots.find(r => r.id === id);
     if (robot) {
         robot.replies = (robot.replies || 0) + 1;
+        updateStats();
         showMessage('Reply generated successfully');
         addLog(robot.name, 'Generated a reply');
     }

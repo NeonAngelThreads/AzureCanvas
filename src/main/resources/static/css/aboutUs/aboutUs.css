@@ -1,0 +1,755 @@
+/* aboutUs.css */
+
+@font-face {
+    font-family: 'Aeonik';
+    src: url('../fonts/Aeonik-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+:root {
+    --primary-magenta: #FF00FF;
+    --laser-blue: #00FFFF;
+    --bg-dark: #050505;
+    --energy-green: #00ff88;
+    --energy-blue: #0088ff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    padding: 0;
+    font-size: 70px;
+    overflow: hidden;
+    font-family: 'Aeonik', sans-serif;
+}
+/* --- CSS Scroll-Driven Animation 变量驱动 --- */
+@property --poker-progress {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 0;
+}
+
+:root {
+    --poker-progress: 0;
+}
+
+.poker-section {
+    height: 400vh; /* 增加滚动长度以承载更复杂的序列 */
+    position: relative;
+    background: #000F33FF;
+    /* 关键：定义滚动驱动时间轴 */
+    view-timeline: --poker-timeline block;
+}
+
+#poker-proxy {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    /* 驱动 CSS 变量 */
+    animation: poker-sync linear both;
+    animation-timeline: --poker-timeline;
+    animation-range: entry 100% exit 100%;
+}
+
+@keyframes poker-sync {
+    from { --poker-progress: 0; }
+    to { --poker-progress: 1; }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    background: #000F33FF;
+    font-family: system-ui, 'Inter', sans-serif;
+    overflow-x: hidden;
+    color: white;
+    transition: background-color 0.8s ease;
+}
+
+/* --- 液态玻璃光效背景 --- */
+.glass-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+    background: #000F33FF;
+    filter: blur(80px);
+}
+
+.experience-orb {
+    position: absolute;
+    width: 40vw;
+    height: 40vw;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 100, 255, 0.4) 0%, rgba(0, 200, 255, 0) 70%);
+    pointer-events: none;
+    mix-blend-mode: screen;
+    transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.orb-1 { top: -10%; left: -10%; background: radial-gradient(circle, rgba(0, 80, 255, 0.5) 0%, rgba(0, 0, 0, 0) 70%); }
+.orb-2 { bottom: -10%; right: -10%; background: radial-gradient(circle, rgba(100, 0, 255, 0.3) 0%, rgba(0, 0, 0, 0) 70%); }
+
+.header-section {
+    height: 100vh;
+    width: 100%;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    z-index: 10;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* --- Sponsors 信息流 --- */
+.sponsors-container {
+    width: 100%;
+    padding: 100px 0;
+    background: transparent;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.marquee-row {
+    display: flex;
+    white-space: nowrap;
+    gap: 80px;
+}
+
+.marquee-content {
+    display: flex;
+    gap: 80px;
+    animation: scroll-left 30s linear infinite;
+}
+
+.marquee-row.reverse .marquee-content {
+    animation: scroll-right 30s linear infinite;
+}
+
+.sponsor-item {
+    font-size: 5rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.sponsor-item i {
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+@keyframes scroll-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+@keyframes scroll-right {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+}
+
+#fluid-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: auto; /* 只有 canvas 接收交互 */
+}
+
+.canvas-container {
+    margin: 0 auto;
+    width: 100%;
+
+    /* 1. 绑定动画 */
+    animation: bg-color-change linear;
+
+    /* 2. 设置动画的时间轴为：当前元素进入视口到离开视口的过程 */
+    animation-timeline: view();
+
+    /* 3. 调整变色的范围（可选）：比如从元素进入 20% 开始到 80% 结束 */
+    animation-range: entry 20% exit 80%;
+}
+
+@keyframes bg-color-change {
+    0%   { background-color: #2f11ef; } /* 刚开始看到这个区域 */
+    50%  { background-color: #0e5beb; } /* 滚动到中间 */
+    100% { background-color: #0e83cc; } /* 彻底滑过后 */
+}
+
+svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* SVG 螺旋标题样式 */
+.svg-wrapper {
+    position: relative;
+}
+
+.spiral-title {
+    position: absolute;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    /* 修改为始终可见，取消动态位移 */
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.spiral-title.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.spiral-title .title-line {
+    display: block;
+    font-weight: 700;
+    line-height: 1.3;
+    /* 修改为纯白色 */
+    background: none;
+    -webkit-text-fill-color: white;
+    color: white;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+}
+
+/* 标题位置：分布在螺线上、中、下 */
+.title-right-1 {
+    right: 15%;
+    top: 15%;
+    text-align: right;
+    max-width: 800px;
+}
+.title-right-1 .title-line {
+    font-size: clamp(100px, 4vw, 36px);
+}
+
+.title-left-1 {
+    left: 10%;
+    top: 45%;
+    text-align: left;
+    max-width: 800px;
+}
+.title-left-1 .title-line {
+    font-size: clamp(100px, 4vw, 36px);
+}
+
+.title-right-2 {
+    right: 15%;
+    top: 75%;
+    text-align: right;
+    max-width: 800px;
+}
+.title-right-2 .title-line {
+    font-size: clamp(100px, 4vw, 36px);
+}
+.spacer {
+    height: 100vh;
+    /*background: linear-gradient(to bottom, #87CEEB, #0035bd);*/
+    background: #003bbe;
+}
+.top-spacer {
+    height: 100vh;
+    background: #000F33FF;
+    position: relative;
+}
+
+.poker-section {
+    height: 500vh; /* 为卡牌动画预留足够的滚动空间 */
+    position: relative;
+    background: #000F33FF;
+}
+
+.poker-iframe-wrapper {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    z-index: 5;
+}
+
+/* --- 移植自 portal-logic 的外景展示框 --- */
+.portal-section {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #87CEEB;
+    position: relative;
+}
+
+#portal-preview-box {
+    width: 600px;
+    height: 350px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+    cursor: pointer;
+    position: relative;
+    background: #000;
+    z-index: 100;
+    /* 防止点击闪烁 */
+    backface-visibility: hidden;
+}
+
+/* --- AzureCanvas Hero Text Styles --- */
+.hero-container {
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 30;
+    text-align: center;
+    width: 100%;
+    pointer-events: none;
+}
+
+.hero-text {
+    font-size: clamp(3rem, 15vw, 12rem);
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: -0.04em;
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(
+            90deg,
+            #00f2ff,
+            #0062ff,
+            #7000ff,
+            #0062ff,
+            #00f2ff
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 5s linear infinite;
+    position: relative;
+    filter: drop-shadow(0 0 30px rgba(0, 162, 255, 0.4));
+    font-family: 'Aeonik', 'Inter', sans-serif;
+}
+
+/* Dynamic Light Sweep Effect */
+.hero-text::after {
+    content: "AzureCanvas";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    background: linear-gradient(
+            115deg,
+            transparent 0%,
+            transparent 40%,
+            rgba(255, 255, 255, 0.7) 50%,
+            transparent 60%,
+            transparent 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: sweep 4s infinite ease-in-out;
+    z-index: 1;
+}
+
+@keyframes shine {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+}
+
+@keyframes sweep {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+html.lenis {
+    height: auto;
+}
+
+.lenis.lenis-smooth {
+    scroll-behavior: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+    overflow: hidden;
+}
+
+body.immersive-about {
+    background: var(--bg-dark);
+    color: white;
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+}
+
+#webgl-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+}
+
+/* 白场过渡遮罩 */
+#transition-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.scroll-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+.hero-section {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+#about-us-title {
+    font-size: 15vw;
+    font-weight: 900;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+}
+
+
+.scroll-spacer {
+    height: 700vh; /* 为 5 张卡牌提供足够的滚动空间 */
+}
+
+/* 瀑布预览框保持原样 */
+.portal-section {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    position: relative;
+    z-index: 10;
+}
+
+#portal-preview-box {
+    width: 600px;
+    height: 350px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+    cursor: pointer;
+    background: #000;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+/* 隐藏滚动条 */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* --- FOLLOW US 大标题 --- */
+.follow-us-title {
+    font-family: 'Aeonik', 'Inter', sans-serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-align: center;
+    margin: 120px 0 60px;
+    color: #ffffff;
+    position: relative;
+    z-index: 2;
+    /* 清爽发光效果 */
+    text-shadow:
+        0 0 10px rgba(0, 242, 255, 0.4),
+        0 0 30px rgba(0, 242, 255, 0.3),
+        0 0 60px rgba(0, 98, 255, 0.2),
+        0 0 100px rgba(0, 98, 255, 0.1);
+    animation: follow-us-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes follow-us-glow {
+    0% {
+        text-shadow:
+            0 0 10px rgba(0, 242, 255, 0.4),
+            0 0 30px rgba(0, 242, 255, 0.3),
+            0 0 60px rgba(0, 98, 255, 0.2),
+            0 0 100px rgba(0, 98, 255, 0.1);
+    }
+    100% {
+        text-shadow:
+            0 0 20px rgba(0, 242, 255, 0.6),
+            0 0 50px rgba(0, 242, 255, 0.4),
+            0 0 90px rgba(0, 98, 255, 0.3),
+            0 0 140px rgba(0, 98, 255, 0.15);
+    }
+}
+
+/* --- 团队卡牌样式 --- */
+.team-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    padding: 100px 20px 200px; /* 增加底部间距给电线 */
+    flex-wrap: wrap;
+    perspective: 1000px;
+    position: relative;
+}
+
+.team-card {
+    width: 280px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 30px;
+    cursor: pointer;
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.6s ease, background 0.6s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 2;
+}
+
+.team-card:hover {
+    transform: translateY(-15px) rotateX(5deg) rotateY(5deg);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 50px rgba(0, 255, 255, 0.2);
+    border-color: rgba(0, 255, 255, 0.3);
+}
+
+.card-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.avatar-wrapper {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    transition: transform 0.6s ease;
+}
+
+.team-card:hover .avatar-wrapper {
+    transform: scale(1.1);
+    border-color: var(--laser-blue);
+}
+
+.avatar-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.nickname {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 15px 0 10px;
+    background: linear-gradient(to right, #fff, var(--laser-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.philosophy {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+}
+
+/* --- GitHub 连接器样式 --- */
+.github-connector-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: -150px;
+    padding-bottom: 150px;
+    z-index: 1;
+}
+
+#wire-svg {
+    position: absolute;
+    top: -500px;
+    left: 0;
+    width: 100%;
+    height: 500px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.wire-path {
+    fill: none;
+    stroke: rgba(0, 255, 255, 0.2);
+    stroke-width: 4;
+    stroke-linecap: square;
+    filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.3));
+}
+
+.energy-pulse {
+    fill: none;
+    stroke: url(#energyGradient);
+    stroke-width: 4;
+    stroke-dasharray: 40, 200;
+    stroke-linecap: square;
+    animation: energy-flow 2s linear infinite;
+    filter: drop-shadow(0 0 12px var(--energy-green)) drop-shadow(0 0 4px var(--energy-blue));
+}
+
+@keyframes energy-flow {
+    0% { stroke-dashoffset: 240; }
+    100% { stroke-dashoffset: 0; }
+}
+
+.github-hub {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(10px);
+    z-index: 10;
+}
+
+.github-hub:hover {
+    transform: scale(1.2);
+    border-color: var(--laser-blue);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+    background: rgba(0, 255, 255, 0.1);
+}
+
+.github-hub i {
+    font-size: 50px;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.github-hub:hover i {
+    color: var(--laser-blue);
+}
+
+/* 悬停浮现内容 */
+.github-hover-content {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.5s ease;
+    width: 200px;
+    justify-content: center;
+}
+
+.github-hub:hover .github-hover-content {
+    opacity: 1;
+    transform: translateY(-20px);
+}
+
+.project-preview {
+    position: absolute;
+    left: -180px;
+    width: 150px;
+    height: 150px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 4px solid var(--laser-blue);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    transform: translateX(-30px);
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.github-hub:hover .project-preview {
+    transform: translateX(0);
+}
+
+.project-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.star-me-text {
+    position: absolute;
+    right: -180px;
+    font-family: 'Aeonik', sans-serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    transform: translateX(30px);
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    white-space: nowrap;
+}
+
+.github-hub:hover .star-me-text {
+    transform: translateX(0);
+}
+
+/* 3D 飞入动画辅助类 */
+.card-flying {
+    z-index: 10000;
+    pointer-events: none;
+}

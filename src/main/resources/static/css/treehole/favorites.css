@@ -1,0 +1,326 @@
+.fav-layout {
+    max-width: 860px;
+    margin: 32px auto;
+    padding: 0 20px;
+}
+
+.fav-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.fav-tab {
+    flex: 1;
+    padding: 13px 10px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    position: relative;
+}
+
+.fav-tab:hover {
+    background: var(--hover-bg);
+    color: var(--text);
+}
+
+.fav-tab.active {
+    color: var(--text);
+    border-bottom-color: var(--text);
+    background: var(--bg-subtle);
+    font-weight: 600;
+}
+
+.fav-tab .tab-badge {
+    background: #e00;
+    color: #fff;
+    font-size: 0.68rem;
+    padding: 1px 6px;
+    border-radius: 20px;
+    min-width: 18px;
+    text-align: center;
+}
+
+.fav-section {
+    display: none;
+}
+
+.fav-section.active {
+    display: block;
+}
+
+.fav-empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 60px 20px;
+    font-size: 1rem;
+}
+
+.fav-empty i {
+    font-size: 2.4rem;
+    display: block;
+    margin-bottom: 12px;
+}
+
+/* Following List */
+.following-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: var(--transition);
+}
+
+.following-card:hover {
+    border-color: #aaa;
+    box-shadow: var(--shadow-sm);
+}
+
+.following-card-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--bg-inset);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.following-card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.following-card-name {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 2px;
+}
+
+.following-card-meta {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.unfollow-btn {
+    padding: 5px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--bg);
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.unfollow-btn:hover {
+    background: #fff0f0;
+    border-color: #e00;
+    color: #e00;
+}
+
+/* Notification List */
+.notif-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    transition: var(--transition);
+}
+
+.notif-item:hover {
+    border-color: #aaa;
+}
+
+.notif-item.unread {
+    border-left: 3px solid #e00;
+}
+
+.notif-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.notif-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-inset);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.notif-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.notif-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e00;
+    flex-shrink: 0;
+}
+
+.notif-content {
+    font-size: 0.95rem;
+    color: var(--text);
+    line-height: 1.6;
+}
+
+.notif-link {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    font-family: inherit;
+    padding: 0;
+}
+
+.notif-link:hover {
+    color: var(--text);
+}
+
+.notif-type-tag {
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: var(--bg-inset);
+    color: var(--text-muted);
+    border: 1px solid var(--border-muted);
+}
+
+/* Message Thread List */
+.msg-thread-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.msg-thread-item:hover {
+    border-color: #aaa;
+    box-shadow: var(--shadow-sm);
+}
+
+.msg-thread-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--bg-inset);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.msg-thread-unread-dot {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #e00;
+    border: 2px solid var(--bg);
+}
+
+.msg-thread-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.msg-thread-name {
+    font-weight: 600;
+    font-size: 0.97rem;
+    margin-bottom: 2px;
+}
+
+.msg-thread-preview {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.msg-thread-time {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    white-space: nowrap;
+}
+
+.mark-all-read {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: inherit;
+    padding: 4px 8px;
+    border-radius: var(--radius);
+    transition: var(--transition);
+}
+
+.mark-all-read:hover {
+    background: var(--hover-bg);
+    color: var(--text);
+}
+
+.section-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.section-count {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
